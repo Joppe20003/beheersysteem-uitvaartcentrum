@@ -7,4 +7,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.application\beheersysteem-uitvaartcentrum.backend.application.csproj" />
+    <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.domain\beheersysteem-uitvaartcentrum.backend.domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Persistence\" />
+  </ItemGroup>
+
 </Project>

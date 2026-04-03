@@ -11,4 +11,13 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.application\beheersysteem-uitvaartcentrum.backend.application.csproj" />
+    <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.infrastructure\beheersysteem-uitvaartcentrum.backend.infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>

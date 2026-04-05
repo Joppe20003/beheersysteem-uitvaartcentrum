@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="beheersysteem-uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj" Id="52e524ed-b398-40e8-a0fb-6ef2e9ed9b86" />
+  <Project Path="beheersysteem-uitvaartcentrum.backend.application/beheersysteem-uitvaartcentrum.backend.application.csproj" Id="6b4b59e4-f7bf-41b3-96e2-b806e6a0cf66" />
+  <Project Path="beheersysteem-uitvaartcentrum.backend.domain/beheersysteem-uitvaartcentrum.backend.domain.csproj" Id="10ff0867-cb22-40a4-a23e-efd5527feb57" />
+  <Project Path="beheersysteem-uitvaartcentrum.backend.infrastructure/beheersysteem-uitvaartcentrum.backend.infrastructure.csproj" Id="129b143e-a2c8-4ce5-a648-d44fe4afc860" />
+  <Project Path="beheersysteem-uitvaartcentrum.frontend/beheersysteem-uitvaartcentrum.frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>

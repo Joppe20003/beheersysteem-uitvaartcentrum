@@ -410,6 +410,8 @@ FodyWeavers.xsd
 # Built Visual Studio Code Extensions
 *.vsix
 
+# App settings with secrets
+appsettings.Development.json
 # Windows Installer files from build outputs
 *.cab
 *.msi

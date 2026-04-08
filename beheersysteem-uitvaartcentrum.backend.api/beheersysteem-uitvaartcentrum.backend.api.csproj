@@ -13,15 +13,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.application\beheersysteem-uitvaartcentrum.backend.application.csproj" />
     <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.infrastructure\beheersysteem-uitvaartcentrum.backend.infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

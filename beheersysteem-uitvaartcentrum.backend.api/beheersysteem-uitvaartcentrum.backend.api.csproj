@@ -21,8 +21,4 @@
     <ProjectReference Include="..\beheersysteem-uitvaartcentrum.backend.infrastructure\beheersysteem-uitvaartcentrum.backend.infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>

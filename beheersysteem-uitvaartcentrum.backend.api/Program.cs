@@ -1,4 +1,8 @@
-﻿using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
+﻿using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
+using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
+using beheersysteem_uitvaartcentrum.backend.application.Services;
+using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
+using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,13 +11,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// PostgreSQL via connection string
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-var app = builder.Build();
+builder.Services.AddScoped<IDossierRepository, DossierRepository>();
+builder.Services.AddScoped<IDossierService, DossierService>();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -26,7 +31,6 @@ if (app.Environment.IsDevelopment())
 
         context.Database.Migrate();
 
-        // Seed data (fixture)
         DbInitializer.Fixture(context);
     }
 }

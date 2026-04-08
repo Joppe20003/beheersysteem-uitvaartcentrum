@@ -1,4 +1,5 @@
-﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
+﻿using beheersysteem_uitvaartcentrum.backend.api.Requests;
+using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,24 +17,15 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
             _dossierService = dossierService;
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            Dossier? dossierModel = await _dossierService.Get(id);
+            ViewDossierDTO? viewDossierDTO = await _dossierService.GetAsync(id);
 
-            if (dossierModel == null)
+            if (viewDossierDTO == null)
             {
-                return NotFound();
+                return NoContent();
             }
-
-            ViewDossierDTO viewDossierDTO = new ViewDossierDTO
-            {
-                Id = dossierModel.Id,
-                Title = dossierModel.Title,
-                Description = dossierModel.Description,
-                DateCreated = dossierModel.DateCreated,
-                Files = dossierModel.Files
-            };
 
             return Ok(viewDossierDTO);
         }
@@ -41,44 +33,29 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<Dossier> dossiersModels = await _dossierService.GetAll();
+            List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllAsync();
 
-            List<OverviewDossierDTO> overviewDossierDTOs = dossiersModels.Select(dossier => new OverviewDossierDTO
-            {
-                Id = dossier.Id,
-                Title = dossier.Title
-            }).ToList();
-
-            return Ok(overviewDossierDTOs);
+            return Ok(overviewDossierDTO);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateDossierDTO createDossierDTO)
+        public async Task<IActionResult> Create([FromBody] CreateDossierRequest createDossierRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            Dossier dossierModel = new Dossier
+            CreateDossierDTO createDossierDTO = new CreateDossierDTO
             {
-                Id = Guid.NewGuid(),
-                Title = createDossierDTO.Title,
-                Description = createDossierDTO.Description,
-                DateCreated = DateTime.UtcNow
+                Title = createDossierRequest.Title,
+                Description = createDossierRequest.Description
             };
+            
+            ViewDossierDTO viewDossierDTO = await _dossierService.CreateAsync(createDossierDTO);
 
-            Dossier createdDossierModel = await _dossierService.Create(dossierModel);
-
-            ViewDossierDTO createdDossierDTO = new ViewDossierDTO
-            {
-                Id = createdDossierModel.Id,
-                Title = createdDossierModel.Title,
-                Description = createdDossierModel.Description,
-                DateCreated = createdDossierModel.DateCreated
-            };
-
-            return CreatedAtAction(nameof(GetById), new { id = createdDossierDTO.Id }, createdDossierDTO);
+            return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
         }
+
     }
 }

@@ -1,0 +1,10 @@
+﻿namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Document
+{
+    public class DownloadDocumentDTO
+    {
+        public string FileName { get; set; } = string.Empty; 
+        public string ContentType { get; set; } = string.Empty;
+        public Stream Content { get; set; } = null!;
+
+    }
+}

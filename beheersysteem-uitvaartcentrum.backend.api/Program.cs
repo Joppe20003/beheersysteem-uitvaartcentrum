@@ -17,6 +17,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IDossierRepository, DossierRepository>();
 builder.Services.AddScoped<IDossierService, DossierService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+builder.Services.AddScoped<IFileStorageProvider, FileStorageProvider>();
 
 var app = builder.Build();
 

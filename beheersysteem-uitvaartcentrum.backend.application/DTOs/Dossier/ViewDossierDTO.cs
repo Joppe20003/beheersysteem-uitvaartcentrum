@@ -12,6 +12,6 @@ namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
 
         public DateTime DateCreated { get; set; }
 
-        public List<DossierFile>? Files { get; set; }
+        public List<OverviewDossierDTO> Documents { get; set; } = null!;
     }
 }

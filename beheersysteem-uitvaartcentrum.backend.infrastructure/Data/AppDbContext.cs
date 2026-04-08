@@ -7,7 +7,7 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Dossier> Dossiers { get; set; } = null!;
-        public DbSet<DossierFile> Documents { get; set; } = null!;
+        public DbSet<DossierModel> Dossiers { get; set; } = null!;
+        public DbSet<DocumentModel> Documents { get; set; } = null!;
     }
 }

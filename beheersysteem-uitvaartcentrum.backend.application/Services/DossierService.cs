@@ -1,4 +1,5 @@
-﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
+﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
+using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
@@ -23,10 +24,12 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 Title = dossierModel.Title,
                 Description = dossierModel.Description,
                 DateCreated = dossierModel.DateCreated,
-                Documents = dossierModel.Documents.Select(documentModel => new OverviewDossierDTO
+                Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO 
                 {
                     Id = documentModel.Id,
-                    Title = documentModel.Title
+                    Title = documentModel.Title,
+                    Extensions = documentModel.Extensions,
+                    DateUploaded = documentModel.DateUploaded
                 }).ToList()
             };
 
@@ -61,10 +64,12 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 Title = createdDossierModel.Title,
                 Description = createdDossierModel.Description,
                 DateCreated = createdDossierModel.DateCreated,
-                Documents = createdDossierModel.Documents.Select(documentModel => new OverviewDossierDTO
+                Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO
                 {
                     Id = documentModel.Id,
-                    Title = documentModel.Title
+                    Title = documentModel.Title,
+                    Extensions = documentModel.Extensions,
+                    DateUploaded = documentModel.DateUploaded
                 }).ToList()
             };
 

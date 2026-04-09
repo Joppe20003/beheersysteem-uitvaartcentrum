@@ -14,11 +14,13 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         {
             _dossierRepository = dossierRepository;
         }
-        public async Task<ViewDossierDTO?> GetAsync(Guid id)
+        public async Task<ViewDossierDTO?> GetDossierAsync(Guid id)
         {
-            DossierModel? dossierModel = await _dossierRepository.getAsync(id);
+            DossierModel? dossierModel = await _dossierRepository.GetDossierAsync(id);
 
-            ViewDossierDTO? dossierDTO = new ViewDossierDTO
+            if (dossierModel == null) return null;
+
+            ViewDossierDTO dossierDTO = new ViewDossierDTO
             {
                 Id = dossierModel.Id,
                 Title = dossierModel.Title,
@@ -36,9 +38,9 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             return dossierDTO;
         }
 
-        public async Task<List<OverviewDossierDTO>> GetAllAsync()
+        public async Task<List<OverviewDossierDTO>> GetAllDossiersAsync()
         {
-            List<DossierModel> dossierModels = await _dossierRepository.getAllAsync();
+            List<DossierModel> dossierModels = await _dossierRepository.GetAllDossiersAsync();
 
             List<OverviewDossierDTO> overviewDossierDTO = dossierModels.Select(dossierModel => new OverviewDossierDTO
             {
@@ -48,7 +50,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
 
             return overviewDossierDTO;
         }
-        public async Task<ViewDossierDTO> CreateAsync(CreateDossierDTO dto)
+        public async Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto)
         {
             DossierModel dossierModel = new DossierModel
             {
@@ -56,7 +58,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 Description = dto.Description
             };
 
-            DossierModel createdDossierModel = await _dossierRepository.createAsync(dossierModel);
+            DossierModel createdDossierModel = await _dossierRepository.CreateDossierAsync(dossierModel);
 
             ViewDossierDTO createdDossierDTO = new ViewDossierDTO
             {

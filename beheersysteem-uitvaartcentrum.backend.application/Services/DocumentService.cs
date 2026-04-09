@@ -17,11 +17,13 @@ public class DocumentService : IDocumentService
     }
 
 
-    public async Task<ViewDocumentDTO?> getAsync(Guid id)
+    public async Task<ViewDocumentDTO?> GetDocumentAsync(Guid id)
     {
-        DocumentModel? documentModel = await _documentRepository.getAsync(id);
+        DocumentModel? documentModel = await _documentRepository.GetDocumentAsync(id);
 
-        ViewDocumentDTO? viewDocumentDTO = new ViewDocumentDTO
+        if (documentModel == null) return null;
+
+        ViewDocumentDTO viewDocumentDTO = new ViewDocumentDTO
         {
             Id = documentModel.Id,
             Title = documentModel.Title,
@@ -32,9 +34,9 @@ public class DocumentService : IDocumentService
         return viewDocumentDTO;
     }
 
-    public async Task<ViewDocumentDTO> uploadDocumentAsync(UploadDocumentDTO dto)
+    public async Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO dto)
     {
-        await _fileStorageProvider.uploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content);
+        await _fileStorageProvider.UploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content);
 
         var model = new DocumentModel
         {
@@ -45,7 +47,7 @@ public class DocumentService : IDocumentService
             DateUploaded = DateTime.UtcNow
         };
 
-        var created = await _documentRepository.createAsync(model);
+        var created = await _documentRepository.CreateDocumentAsync(model);
 
         return new ViewDocumentDTO
         {
@@ -56,13 +58,13 @@ public class DocumentService : IDocumentService
         };
     }
 
-    public async Task<DownloadDocumentDTO?> downloadDocumentAsync(Guid id)
+    public async Task<DownloadDocumentDTO?> DownloadDocumentAsync(Guid id)
     {
-        var doc = await _documentRepository.getAsync(id);
+        var doc = await _documentRepository.GetDocumentAsync(id);
 
         if (doc == null) return null;
 
-        var stream = await _fileStorageProvider.downloadDocumentAsync(doc.DossierId, doc.Title);
+        var stream = await _fileStorageProvider.DownloadDocumentAsync(doc.DossierId, doc.Title);
 
         return new DownloadDocumentDTO
         {
@@ -72,12 +74,15 @@ public class DocumentService : IDocumentService
         };
     }
 
-    private string GetContentType(string extension) => extension.ToLower() switch
+    private string GetContentType(string extension)
     {
-        ".pdf" => "application/pdf",
-        ".jpg" => "image/jpeg",
-        ".jpeg" => "image/jpeg",
-        ".png" => "image/png",
-        _ => "application/octet-stream"
-    };
+        return extension.ToLower() switch
+        {
+            ".pdf" => "application/pdf",
+            ".jpg" => "image/jpeg",
+            ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            _ => "application/octet-stream"
+        };
+    }
 }

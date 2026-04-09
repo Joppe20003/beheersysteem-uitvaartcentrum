@@ -2,7 +2,7 @@
 {
     public interface IFileStorageProvider
     {
-        public Task uploadDocumentAsync(Guid dossierId, string fileName, Stream content);
-        public Task<Stream> downloadDocumentAsync(Guid dossierId, string fileName);
+        public Task UploadDocumentAsync(Guid dossierId, string fileName, Stream content);
+        public Task<Stream> DownloadDocumentAsync(Guid dossierId, string fileName);
     }
 }

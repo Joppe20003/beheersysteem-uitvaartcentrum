@@ -20,7 +20,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            ViewDocumentDTO? document = await _documentService.getAsync(id);
+            ViewDocumentDTO? document = await _documentService.GetDocumentAsync(id);
 
             if (document == null)
             {
@@ -33,7 +33,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet("{id}/download")]
         public async Task<IActionResult> Download(Guid id)
         {
-            DownloadDocumentDTO? downloadDocumentDTO = await _documentService.downloadDocumentAsync(id);
+            DownloadDocumentDTO? downloadDocumentDTO = await _documentService.DownloadDocumentAsync(id);
 
             if (downloadDocumentDTO == null)
             {
@@ -52,14 +52,14 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 return BadRequest(ModelState);
             }
 
-            UploadDocumentDTO uploadDossierFileDTO = new UploadDocumentDTO
+            UploadDocumentDTO uploadDocumentDTO = new UploadDocumentDTO
             {
                 DossierId = uploadDocumentRequest.DossierId,
                 FileName = uploadDocumentRequest.File.FileName,
                 Content = uploadDocumentRequest.File.OpenReadStream()
             };
 
-            ViewDocumentDTO viewDocumentDTO = await _documentService.uploadDocumentAsync(uploadDossierFileDTO);
+            ViewDocumentDTO viewDocumentDTO = await _documentService.UploadDocumentAsync(uploadDocumentDTO);
 
             return CreatedAtAction(nameof(Get), new { id = viewDocumentDTO.Id }, viewDocumentDTO);
         }

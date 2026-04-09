@@ -14,17 +14,17 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<DossierModel?> getAsync(Guid id)
+        public async Task<DossierModel?> GetDossierAsync(Guid id)
         {
             return await _appDbContext.Dossiers.Include(d => d.Documents).FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task<List<DossierModel>> getAllAsync()
+        public async Task<List<DossierModel>> GetAllDossiersAsync()
         {
             return await _appDbContext.Dossiers.ToListAsync();
         }
 
-        public async Task<DossierModel> createAsync(DossierModel dossier)
+        public async Task<DossierModel> CreateDossierAsync(DossierModel dossier)
         {
             _appDbContext.Dossiers.Add(dossier);
 

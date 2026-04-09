@@ -10,7 +10,7 @@ public class FileStorageProvider : IFileStorageProvider
         _uploadRoot = configuration["FileStorage:BasePath"];
     }
 
-    public async Task uploadDocumentAsync(Guid dossierId, string fileName, Stream content)
+    public async Task UploadDocumentAsync(Guid dossierId, string fileName, Stream content)
     {
         string storagePath = GetStoragePath(dossierId, fileName);
 
@@ -21,7 +21,7 @@ public class FileStorageProvider : IFileStorageProvider
         await content.CopyToAsync(fileStream);
     }
 
-    public Task<Stream> downloadDocumentAsync(Guid dossierId, string fileName)
+    public Task<Stream> DownloadDocumentAsync(Guid dossierId, string fileName)
     {
         string path = GetStoragePath(dossierId, fileName);
 

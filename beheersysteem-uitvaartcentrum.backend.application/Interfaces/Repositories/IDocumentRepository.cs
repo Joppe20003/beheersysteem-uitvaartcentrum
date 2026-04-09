@@ -4,7 +4,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositor
 {
     public interface IDocumentRepository
     {
-        public Task<DocumentModel?> getAsync(Guid id);
-        public Task<DocumentModel> createAsync(DocumentModel dossierFileModel);
+        public Task<DocumentModel?> GetDocumentAsync(Guid id);
+        public Task<DocumentModel> CreateDocumentAsync(DocumentModel dossierFileModel);
     }
 }

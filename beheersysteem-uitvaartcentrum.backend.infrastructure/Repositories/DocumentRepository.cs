@@ -13,13 +13,13 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<DocumentModel?> getAsync(Guid id)
+        public async Task<DocumentModel?> GetDocumentAsync(Guid id)
         {
             return await _appDbContext.Documents.FindAsync(id);
         }
 
 
-        public async Task<DocumentModel> createAsync(DocumentModel file)
+        public async Task<DocumentModel> CreateDocumentAsync(DocumentModel file)
         {
             _appDbContext.Documents.Add(file);
 

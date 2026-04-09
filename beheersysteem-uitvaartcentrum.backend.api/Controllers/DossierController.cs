@@ -1,7 +1,6 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.api.Requests;
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
-using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
@@ -20,7 +19,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            ViewDossierDTO? viewDossierDTO = await _dossierService.GetAsync(id);
+            ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(id);
 
             if (viewDossierDTO == null)
             {
@@ -33,7 +32,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllAsync();
+            List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllDossiersAsync();
 
             return Ok(overviewDossierDTO);
         }
@@ -52,7 +51,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 Description = createDossierRequest.Description
             };
             
-            ViewDossierDTO viewDossierDTO = await _dossierService.CreateAsync(createDossierDTO);
+            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(createDossierDTO);
 
             return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
         }

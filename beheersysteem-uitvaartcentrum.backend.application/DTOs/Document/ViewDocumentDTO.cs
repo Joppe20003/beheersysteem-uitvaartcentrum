@@ -1,12 +1,10 @@
-﻿namespace beheersysteem_uitvaartcentrum.backend.domain.Models
+﻿namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Document
 {
-    public class DossierFile
+    public class ViewDocumentDTO
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public Guid DossierId { get; set; }
         public string Extensions { get; set; } = string.Empty;
         public DateTime DateUploaded { get; set; }
-        public Dossier Dossier { get; set; } = null!;
     }
 }

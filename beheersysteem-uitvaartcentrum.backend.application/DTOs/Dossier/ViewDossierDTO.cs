@@ -1,4 +1,4 @@
-﻿using beheersysteem_uitvaartcentrum.backend.domain.Models;
+﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
 {
@@ -12,6 +12,6 @@ namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
 
         public DateTime DateCreated { get; set; }
 
-        public List<DossierFile>? Files { get; set; }
+        public List<ViewDocumentDTO> Documents { get; set; } = null!;
     }
 }

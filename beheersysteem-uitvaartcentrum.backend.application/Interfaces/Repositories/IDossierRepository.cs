@@ -4,8 +4,8 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositor
 {
     public interface IDossierRepository
     {
-        public Task<Dossier?> Get(Guid id);
-        public Task<List<Dossier>> GetAll();
-        public Task<Dossier> Create(Dossier dossier);
+        public Task<DossierModel?> getAsync(Guid id);
+        public Task<List<DossierModel>> getAllAsync();
+        public Task<DossierModel> createAsync(DossierModel dossier);
     }
 }

@@ -9,21 +9,21 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Data
             if (!context.Dossiers.Any())
             {
                 context.AddRange(
-                    new Dossier
+                    new DossierModel
                     {
                         Id = Guid.NewGuid(),
                         Title = "Dossier 1",
                         Description = "Beschrijving van dossier 1",
                         DateCreated = DateTime.UtcNow
                     },
-                    new Dossier
+                    new DossierModel
                     {
                         Id = Guid.NewGuid(),
                         Title = "Dossier 2",
                         Description = "Beschrijving van dossier 2",
                         DateCreated = DateTime.UtcNow
                     },
-                    new Dossier
+                    new DossierModel
                     {
                         Id = Guid.NewGuid(),
                         Title = "Dossier 3",

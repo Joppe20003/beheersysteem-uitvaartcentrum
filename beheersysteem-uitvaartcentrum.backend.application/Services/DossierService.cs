@@ -1,4 +1,6 @@
-﻿using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
+﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
+using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
+using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
 
@@ -12,20 +14,66 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         {
             _dossierRepository = dossierRepository;
         }
-
-        public async Task<Dossier?> Get(Guid id)
+        public async Task<ViewDossierDTO?> GetAsync(Guid id)
         {
-            return await _dossierRepository.Get(id);
+            DossierModel? dossierModel = await _dossierRepository.getAsync(id);
+
+            ViewDossierDTO? dossierDTO = new ViewDossierDTO
+            {
+                Id = dossierModel.Id,
+                Title = dossierModel.Title,
+                Description = dossierModel.Description,
+                DateCreated = dossierModel.DateCreated,
+                Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO 
+                {
+                    Id = documentModel.Id,
+                    Title = documentModel.Title,
+                    Extensions = documentModel.Extensions,
+                    DateUploaded = documentModel.DateUploaded
+                }).ToList()
+            };
+
+            return dossierDTO;
         }
 
-        public async Task<List<Dossier>> GetAll()
+        public async Task<List<OverviewDossierDTO>> GetAllAsync()
         {
-            return await _dossierRepository.GetAll();
-        }
+            List<DossierModel> dossierModels = await _dossierRepository.getAllAsync();
 
-        public async Task<Dossier> Create(Dossier dossier)
+            List<OverviewDossierDTO> overviewDossierDTO = dossierModels.Select(dossierModel => new OverviewDossierDTO
+            {
+                Id = dossierModel.Id,
+                Title = dossierModel.Title
+            }).ToList();
+
+            return overviewDossierDTO;
+        }
+        public async Task<ViewDossierDTO> CreateAsync(CreateDossierDTO dto)
         {
-            return await _dossierRepository.Create(dossier);
+            DossierModel dossierModel = new DossierModel
+            {
+                Title = dto.Title,
+                Description = dto.Description
+            };
+
+            DossierModel createdDossierModel = await _dossierRepository.createAsync(dossierModel);
+
+            ViewDossierDTO createdDossierDTO = new ViewDossierDTO
+            {
+                Id = createdDossierModel.Id,
+                Title = createdDossierModel.Title,
+                Description = createdDossierModel.Description,
+                DateCreated = createdDossierModel.DateCreated,
+                Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO
+                {
+                    Id = documentModel.Id,
+                    Title = documentModel.Title,
+                    Extensions = documentModel.Extensions,
+                    DateUploaded = documentModel.DateUploaded
+                }).ToList()
+            };
+
+            return createdDossierDTO;
         }
     }
 }

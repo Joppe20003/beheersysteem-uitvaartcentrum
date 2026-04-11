@@ -1,4 +1,5 @@
-﻿using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
+﻿using beheersysteem_uitvaartcentrum.backend.application.Exceptions;
+using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.domain.Constanten;
 using Microsoft.Extensions.Configuration;
 
@@ -52,7 +53,7 @@ public class FileStorageProvider : IFileStorageProvider
 
         if (!Constanten.AllowedFileExtensions.Contains(extension))
         {
-            throw new ArgumentException($"Bestandstype '{extension}' is niet toegestaan.");
+            throw new NotAllowedFileExtension("Bestand type niet toegestaan", $"bestand type met het type {extension} is niet toegestaan");
         }
     }
 

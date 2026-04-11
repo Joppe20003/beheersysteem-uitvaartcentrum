@@ -54,7 +54,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 
             UploadDocumentDTO uploadDocumentDTO = new UploadDocumentDTO
             {
-                DossierId = uploadDocumentRequest.DossierId,
+                DossierId = uploadDocumentRequest.DossierId!.Value,
                 FileName = uploadDocumentRequest.File.FileName,
                 Content = uploadDocumentRequest.File.OpenReadStream()
             };

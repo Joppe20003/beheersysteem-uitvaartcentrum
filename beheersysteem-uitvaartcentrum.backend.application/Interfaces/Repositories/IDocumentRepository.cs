@@ -6,5 +6,6 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositor
     {
         public Task<DocumentModel?> GetDocumentAsync(Guid id);
         public Task<DocumentModel> CreateDocumentAsync(DocumentModel dossierFileModel);
+        public Task<DocumentModel?> GetDocumentByDossierAndNameAsync(Guid dossierId, string fileName);
     }
 }

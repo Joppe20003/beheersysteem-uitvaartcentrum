@@ -1,4 +1,5 @@
-﻿using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
+﻿using beheersysteem_uitvaartcentrum.backend.api.Middleware;
+using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
@@ -38,10 +39,9 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

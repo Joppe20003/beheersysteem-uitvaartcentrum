@@ -1,19 +1,23 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.DossierFile;
+using beheersysteem_uitvaartcentrum.backend.application.Exceptions;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
+using beheersysteem_uitvaartcentrum.backend.domain.Constanten;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
 
 public class DocumentService : IDocumentService
 {
     private readonly IFileStorageProvider _fileStorageProvider;
     private readonly IDocumentRepository _documentRepository;
+    private readonly IDossierService _dossierService;
 
-    public DocumentService(IFileStorageProvider fileStorageProvider, IDocumentRepository documentRepository)
+    public DocumentService(IFileStorageProvider fileStorageProvider, IDocumentRepository documentRepository, IDossierService dossierService)
     {
         _fileStorageProvider = fileStorageProvider;
         _documentRepository = documentRepository;
+        _dossierService = dossierService;
     }
 
 
@@ -36,7 +40,23 @@ public class DocumentService : IDocumentService
 
     public async Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO dto)
     {
-        await _fileStorageProvider.UploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content);
+        await CheckDossierIdExists(dto.DossierId);
+
+        await _fileStorageProvider.CheckExstensionIsAllowed(dto.FileName);
+        await _fileStorageProvider.UploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content, Constanten.AllowedFileExtensions);
+
+        DocumentModel? existing = await _documentRepository.GetDocumentByDossierAndNameAsync(dto.DossierId, dto.FileName);
+
+        if (existing != null)
+        {
+            return new ViewDocumentDTO
+            {
+                Id = existing.Id,
+                Title = existing.Title,
+                Extensions = existing.Extensions,
+                DateUploaded = existing.DateUploaded
+            };
+        }
 
         var model = new DocumentModel
         {
@@ -69,20 +89,18 @@ public class DocumentService : IDocumentService
         return new DownloadDocumentDTO
         {
             FileName = doc.Title,
-            ContentType = GetContentType(doc.Extensions),
+            ContentType = _fileStorageProvider.GetContentType(doc.Extensions),
             Content = stream
         };
     }
 
-    private string GetContentType(string extension)
+    private async Task CheckDossierIdExists(Guid dossierId)
     {
-        return extension.ToLower() switch
+        ViewDossierDTO? dossierViewDTO = await _dossierService.GetDossierAsync(dossierId);
+
+        if (dossierViewDTO == null)
         {
-            ".pdf" => "application/pdf",
-            ".jpg" => "image/jpeg",
-            ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            _ => "application/octet-stream"
-        };
+            throw new NotFoundForeignKey("Dossier niet gevonden", $"Dossier met het ID {dossierId} bestaat niet.");
+        }
     }
 }

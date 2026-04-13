@@ -10,5 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\assets\" />
+    <Folder Include="src\assets\" />
+    <Folder Include="src\components\others\" />
+    <Folder Include="src\constants\" />
+    <Folder Include="src\contexts\" />
+    <Folder Include="src\hooks\" />
+    <Folder Include="src\utils\" />
+    <Folder Include="src\services\" />
   </ItemGroup>
 </Project>

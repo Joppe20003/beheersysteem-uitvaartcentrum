@@ -10,9 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="src\constansts\**" />
-    <None Remove="src\contexts\**" />
     <TypeScriptConfiguration Remove="src\constansts\**" />
-    <TypeScriptConfiguration Remove="src\contexts\**" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\utils\" />

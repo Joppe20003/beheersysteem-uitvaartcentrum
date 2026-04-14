@@ -1,19 +1,15 @@
 import { Outlet } from "react-router-dom";
-import { AlertProvider } from "../context/AlertContext";
+import { AlertProvider } from "../providers/AlertProvider"
 import Alert from "../components/structures/Alert";
 
 function MainLayout() {
     return (
         <AlertProvider>
-            <div className="bg-light min-vh-100">
-                <div className="container bg-white shadow position-relative min-vh-100">
-                    <div className="row">
-                        <main>
-                            <Alert />
-                            <Outlet />
-                        </main>
-                    </div>
-                </div>
+            <div className="bg-light">
+                <main className="container bg-white shadow position-relative min-vh-100">
+                    <Alert />
+                    <Outlet />
+                </main>
             </div>
         </AlertProvider>
     );

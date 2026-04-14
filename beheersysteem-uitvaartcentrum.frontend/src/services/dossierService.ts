@@ -1,17 +1,26 @@
 import { BASE_URL } from "../constants/routes";
 
-const post = async (url: string, data: unknown) => {
-    const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
+class DossierService {
+    private baseUrl: string;
 
-    if (!res.ok) throw await res;
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl;
+    }
 
-    return res.json();
-};
+    private async post(endpoint: string, data: unknown) {
+        const res = await fetch(this.baseUrl + endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
 
-export const dossierService = {
-    create: (data: unknown) => post(BASE_URL + "dossier", data),
-};
+        if (!res.ok) throw res;
+        return res.json();
+    }
+
+    create(data: unknown) {
+        return this.post("dossier", data);
+    }
+}
+
+export const dossierService = new DossierService(BASE_URL);

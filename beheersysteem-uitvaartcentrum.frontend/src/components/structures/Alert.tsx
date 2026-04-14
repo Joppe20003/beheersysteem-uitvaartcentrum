@@ -1,4 +1,4 @@
-import { useAlert } from "../../context/AlertContext";
+import { useAlert } from '../../hooks/useAlert';
 
 function Alert() {
     const { alert, clearAlert } = useAlert();

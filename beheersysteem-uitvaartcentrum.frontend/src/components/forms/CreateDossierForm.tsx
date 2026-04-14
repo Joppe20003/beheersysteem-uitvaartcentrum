@@ -63,7 +63,7 @@ function CreateDossierForm({ onSubmit, onBack }: CreateDossierFormProps) {
                     Terug
                 </button>
                 <button type="submit" className="btn btn-primary w-100" disabled={isLoading}>
-                    {isLoading ? "Bezig met aanmaken..." : "Aanmaken"}
+                    {isLoading ? "Bezig met aanmaken..." : "Opslaan"}
                 </button>
             </fieldset>
         </form>

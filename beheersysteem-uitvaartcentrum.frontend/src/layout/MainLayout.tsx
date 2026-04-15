@@ -1,18 +1,17 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import { Outlet } from "react-router-dom";
-import Footer from "../components/structures/Footer";
-import Header from "../components/structures/Header";
+import { AlertProvider } from "../providers/AlertProvider"
+import Alert from "../components/structures/Alert";
 
 function MainLayout() {
     return (
-        <div className="d-flex flex-column min-vh-100">
-            <Header />
-            <main className="flex-grow-1">
-                <Outlet />
-            </main>
-            <Footer />
-        </div>
+        <AlertProvider>
+            <div className="bg-light">
+                <main className="container bg-white shadow position-relative min-vh-100">
+                    <Alert />
+                    <Outlet />
+                </main>
+            </div>
+        </AlertProvider>
     );
 }
 

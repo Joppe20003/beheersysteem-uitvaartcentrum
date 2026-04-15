@@ -1,25 +1,30 @@
-import { Route, Routes } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import MainLayout  from "./layout/MainLayout.tsx";
-import NotFound from "./pages/others/NotFound.tsx";
-import Overview from "./pages/dossiers/Overview.tsx";
-import View from "./pages/dossiers/View.tsx";
-import Create from "./pages/dossiers/Create.tsx";
+import { Route, Routes, Navigate } from "react-router-dom";
+
+import MainLayout from "./layout/MainLayout";
+
+import NotFound from "./pages/others/NotFound";
+import Overview from "./pages/dossiers/Overview";
+import View from "./pages/dossiers/View";
+import Create from "./pages/dossiers/Create";
 
 function App() {
     return (
         <Routes>
-            <Route element={<MainLayout />} >
-                <Route path="/" element={<Overview />} />
-                <Route path="/dossiers" element={<Overview />} />
-                <Route path="/dossiers/:id/view" element={<View />} />
-                <Route path="/dossiers/aanmaken" element={<Create />} />
-            </Route>
-            <Route>
-                <Route path="/*" element={<NotFound />} />
+            <Route path="/" element={<MainLayout />}>
+                <Route index element={<Navigate to="/dossiers" replace />} />
+
+                <Route path="dossiers">
+                    <Route index element={<Overview />} />
+                    <Route path="aanmaken" element={<Create />} />
+                    <Route path=":id/view" element={<View />} />
+                </Route>
+
+                <Route path="*" element={<NotFound />} />
             </Route>
         </Routes>
     );
 }
 
-export default App
+export default App;

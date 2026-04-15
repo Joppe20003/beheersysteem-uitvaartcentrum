@@ -9,10 +9,10 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\constansts\" />
-    <Folder Include="src\hooks\" />
-    <Folder Include="src\contexts\" />
-    <Folder Include="src\services\" />
+    <None Remove="src\constansts\**" />
+    <TypeScriptConfiguration Remove="src\constansts\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="src\utils\" />
   </ItemGroup>
 </Project>

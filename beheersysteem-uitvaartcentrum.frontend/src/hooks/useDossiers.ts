@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 import { dossierService } from "../services/dossierService";
 
-type Dossier = {
-    id: number;
-    title: string;
-}
-
 function useDossiers() {
-    const [dossiers, setDossiers] = useState<Dossier[]>([]);
+    const [dossiers, setDossiers] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     useEffect(() => {

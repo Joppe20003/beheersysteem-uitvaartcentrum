@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import { Route, Routes, Navigate } from "react-router-dom";
 
@@ -18,7 +19,7 @@ function App() {
                 <Route path="dossiers">
                     <Route index element={<Overview />} />
                     <Route path="aanmaken" element={<Create />} />
-                    <Route path=":id/view" element={<View />} />
+                    <Route path="view/:id" element={<View />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

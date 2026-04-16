@@ -1,0 +1,19 @@
+import React from 'react'; 
+
+import { Link } from 'react-router-dom'; 
+
+type OverviewDossierCardProps = { 
+    id: string; 
+    title: string; 
+}; 
+
+function OverviewDossierCardComponent({ id, title }: OverviewDossierCardProps) { 
+    return ( 
+        <Link to={`view/${id}`} className="d-block text-center text-decoration-none border mt-4 p-2 pb-4" > 
+            <i className="bi bi-folder-fill text-warning text-center" style={{ fontSize: "5rem"}} /> 
+            <h3 className="fw-normal text-black" >{title}</h3>
+        </Link> 
+    ); 
+} 
+
+export default OverviewDossierCardComponent;

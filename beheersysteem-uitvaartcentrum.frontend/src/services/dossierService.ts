@@ -18,8 +18,22 @@ class DossierService {
         return res.json();
     }
 
+    private async get(endpoint: string) {
+        const res = await fetch(this.baseUrl + endpoint, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) throw res;
+        return res.json();
+    }
+
     create(data: unknown) {
         return this.post("dossier", data);
+    }
+
+    getAll() {
+        return this.get("dossier");
     }
 }
 

@@ -35,6 +35,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
             {
                 context.Response.StatusCode = 415;
                 context.Response.ContentType = "application/json";
+
                 await context.Response.WriteAsJsonAsync(new
                 {
                     type = "https://tools.ietf.org/html/rfc9110#section-15.5.16",

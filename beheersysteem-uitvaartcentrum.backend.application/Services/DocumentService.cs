@@ -43,12 +43,17 @@ public class DocumentService : IDocumentService
         await CheckDossierIdExists(dto.DossierId);
 
         await _fileStorageProvider.CheckExstensionIsAllowed(dto.FileName);
+
         await _fileStorageProvider.UploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content, Constanten.AllowedFileExtensions);
 
         DocumentModel? existing = await _documentRepository.GetDocumentByDossierAndNameAsync(dto.DossierId, dto.FileName);
 
         if (existing != null)
         {
+            existing.DateUploaded = DateTime.UtcNow;
+
+            await _documentRepository.UpdateDocumentAsync(existing);
+
             return new ViewDocumentDTO
             {
                 Id = existing.Id,
@@ -58,7 +63,7 @@ public class DocumentService : IDocumentService
             };
         }
 
-        var model = new DocumentModel
+        DocumentModel model = new DocumentModel
         {
             Id = Guid.NewGuid(),
             DossierId = dto.DossierId,
@@ -67,7 +72,7 @@ public class DocumentService : IDocumentService
             DateUploaded = DateTime.UtcNow
         };
 
-        var created = await _documentRepository.CreateDocumentAsync(model);
+        DocumentModel created = await _documentRepository.CreateDocumentAsync(model);
 
         return new ViewDocumentDTO
         {
@@ -80,16 +85,16 @@ public class DocumentService : IDocumentService
 
     public async Task<DownloadDocumentDTO?> DownloadDocumentAsync(Guid id)
     {
-        var doc = await _documentRepository.GetDocumentAsync(id);
+        DocumentModel? documentModel = await _documentRepository.GetDocumentAsync(id);
 
-        if (doc == null) return null;
+        if (documentModel == null) return null;
 
-        var stream = await _fileStorageProvider.DownloadDocumentAsync(doc.DossierId, doc.Title);
+        Stream stream = await _fileStorageProvider.DownloadDocumentAsync(documentModel.DossierId, documentModel.Title);
 
         return new DownloadDocumentDTO
         {
-            FileName = doc.Title,
-            ContentType = _fileStorageProvider.GetContentType(doc.Extensions),
+            FileName = documentModel.Title,
+            ContentType = _fileStorageProvider.GetContentType(documentModel.Extensions),
             Content = stream
         };
     }

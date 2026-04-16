@@ -19,6 +19,12 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories
             return await _appDbContext.Documents.FindAsync(id);
         }
 
+        public async Task UpdateDocumentAsync(DocumentModel document)
+        {
+            _appDbContext.Documents.Update(document);
+            await _appDbContext.SaveChangesAsync();
+        }
+
         public async Task<DocumentModel> CreateDocumentAsync(DocumentModel file)
         {
             _appDbContext.Documents.Add(file);

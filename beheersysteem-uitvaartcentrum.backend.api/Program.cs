@@ -1,4 +1,5 @@
-﻿using beheersysteem_uitvaartcentrum.backend.api.Middleware;
+﻿using beheersysteem_uitvaartcentrum.backend.api.Filters;
+using beheersysteem_uitvaartcentrum.backend.api.Middleware;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
@@ -8,7 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<SanitizeInputFilter>();
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

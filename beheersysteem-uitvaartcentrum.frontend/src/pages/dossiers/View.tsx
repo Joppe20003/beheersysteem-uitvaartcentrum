@@ -90,7 +90,7 @@ function View() {
             />
             <article>
                 <header className="d-flex py-2">
-                    <legend className="h1" tabIndex={0}>{dossier?.title}</legend>
+                    <legend className="h3" tabIndex={0}>{dossier?.title}</legend>
 
                     <div className="d-none d-sm-block">
                         <div className="d-flex" style={{ height: "stretch" }}>

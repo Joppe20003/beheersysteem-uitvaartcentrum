@@ -1,0 +1,12 @@
+﻿using beheersysteem_uitvaartcentrum.backend.domain.Models;
+
+namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories
+{
+    public interface IDocumentRepository
+    {
+        public Task<DocumentModel?> GetDocumentAsync(Guid id);
+        public Task UpdateDocumentAsync(DocumentModel document);
+        public Task<DocumentModel> CreateDocumentAsync(DocumentModel dossierFileModel);
+        public Task<DocumentModel?> GetDocumentByDossierAndNameAsync(Guid dossierId, string fileName);
+    }
+}

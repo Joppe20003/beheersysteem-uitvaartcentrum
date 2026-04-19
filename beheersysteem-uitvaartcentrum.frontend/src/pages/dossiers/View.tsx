@@ -120,7 +120,7 @@ function View() {
                 <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Niet aanwezig"}</p>
                 <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
                 <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
-                <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden:</p>
+                <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden: (toegestaande extensies: PDF, JPG, JPEG, PNG)</p>
                 <Table data={dossier?.documents || []} columns={columns} noResultsText="Gekoppelde bestanden bij dit dossier" />
             </article>
             <div className="d-sm-none col-12" style={{ height: 120 }} />

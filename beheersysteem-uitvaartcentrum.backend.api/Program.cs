@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Threat #25/#32 - XSS mitigatie: globale sanitatie filter voor alle inkomende requests
+builder.Services.AddScoped<SanitizeInputFilter>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SanitizeInputFilter>();

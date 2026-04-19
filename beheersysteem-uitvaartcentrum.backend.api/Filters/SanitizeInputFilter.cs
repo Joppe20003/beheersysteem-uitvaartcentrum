@@ -4,6 +4,10 @@ using System.Text.Encodings.Web;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Filters
 {
+    // Threat #25/#32 - Cross-Site Scripting (XSS) mitigatie
+    // Deze filter saniteerd alle inkomende gebruikersinput automatisch
+    // door gevaarlijke tekens te encoderen met HtmlEncoder voor opslag.
+    
     public class SanitizeInputFilter : IActionFilter
     {
         public void OnActionExecuting(ActionExecutingContext context)

@@ -12,7 +12,4 @@
     <None Remove="src\constansts\**" />
     <TypeScriptConfiguration Remove="src\constansts\**" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\utils\" />
-  </ItemGroup>
 </Project>

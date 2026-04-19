@@ -1,10 +1,6 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import 'bootstrap-icons/font/bootstrap-icons.css';
-
 import { Route, Routes, Navigate } from "react-router-dom";
 
 import MainLayout from "./layout/MainLayout";
-
 import NotFound from "./pages/others/NotFound";
 import Overview from "./pages/dossiers/Overview";
 import View from "./pages/dossiers/View";

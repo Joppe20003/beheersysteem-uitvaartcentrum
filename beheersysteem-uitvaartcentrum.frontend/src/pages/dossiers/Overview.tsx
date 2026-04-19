@@ -10,8 +10,8 @@ function Overview() {
     return (
         <section className="row">
             <header className="col-12 pt-2 d-flex">
-                <legend tabIndex={0}>Dossiers overzicht</legend>
-                <button className="btn btn-primary d-none d-sm-block" style={{ height: "fit-content" }} onClick={() => navigate("aanmaken")}>
+                <legend className="h1" tabIndex={0}>Dossiers overzicht</legend>
+                <button className="btn btn-primary d-none d-sm-block px-5" style={{ height: "strecht", fontSize: "1.25rem" }} onClick={() => navigate("aanmaken")}>
                     Toevoegen
                 </button>
             </header>
@@ -23,6 +23,7 @@ function Overview() {
                     <OverviewDossierCartComponent id={dossier.id} title={dossier.title} />
                 </article>)
             )}
+            <div className="d-sm-none col-12" style={{ height: 70 }} />
             <div className="d-sm-none position-fixed bg-white bottom-0 border-top shadow p-2">
                 <button className="btn btn-primary" style={{ width: "stretch" }} onClick={() => navigate("aanmaken")}>
                     Toevoegen

@@ -35,6 +35,10 @@ class DossierService {
     getAll() {
         return this.get("dossier");
     }
+
+    getById(id: string) {
+        return this.get(`dossier/${id}`);
+    }
 }
 
 export const dossierService = new DossierService(BASE_URL);

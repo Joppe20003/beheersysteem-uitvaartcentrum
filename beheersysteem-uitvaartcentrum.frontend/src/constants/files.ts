@@ -1,0 +1,1 @@
+export const ACCEPTED_FILE_EXSTENSIONS = "application/pdf,image/png,image/jpeg";

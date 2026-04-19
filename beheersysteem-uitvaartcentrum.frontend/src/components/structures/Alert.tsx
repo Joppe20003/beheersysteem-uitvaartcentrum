@@ -1,14 +1,28 @@
+import { useEffect, useRef } from 'react';
 import { useAlert } from '../../hooks/useAlert';
 
 function Alert() {
     const { alert, clearAlert } = useAlert();
+    const alertRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (alert) {
+            alertRef.current?.focus();
+        }
+    }, [alert]);
 
     if (!alert) return null;
 
     return (
-        <div className={`alert alert-${alert.type} alert-dismissible position-absolute col-md-4`} style={{ right: 10, top: 10 }} role="alert" aria-label="Melding sluiten">
+        <div
+            ref={alertRef}
+            className={`alert alert-${alert.type} alert-dismissible position-absolute col-md-4`}
+            style={{ right: 10, top: 10 }}
+            role="alert"
+            tabIndex={0}
+        >
             {alert.message}
-            <button type="button" className="btn-close" onClick={clearAlert} />
+            <button type="button" className="btn-close" aria-aria-label={`${alert.message}, melding sluiten`} onClick={clearAlert} />
         </div>
     );
 }

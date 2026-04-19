@@ -117,10 +117,11 @@ function View() {
                         </div>
                     </div>
                 </header>
-                <p className="h4 fw-normal text-muted mb-4">{dossier?.description || "Niet aanwezig"}</p>
-                <p className="h4 fw-normal mb-2">Aanmaak datum:</p>
-                <p className="h4 fw-normal text-muted mb-4">{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
-                <Table data={dossier?.documents || []} columns={columns} />
+                <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Niet aanwezig"}</p>
+                <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
+                <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
+                <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden:</p>
+                <Table data={dossier?.documents || []} columns={columns} noResultsText="Gekoppelde bestanden bij dit dossier" />
             </article>
             <div className="d-sm-none col-12" style={{ height: 120 }} />
             <div className="d-sm-none position-fixed bg-white bottom-0 border-top shadow p-2">

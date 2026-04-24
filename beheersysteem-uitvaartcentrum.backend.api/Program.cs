@@ -5,6 +5,7 @@ using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AppConnection"))
+);
+
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection"))
 );
 
 builder.Services.AddScoped<IDossierRepository, DossierRepository>();
@@ -28,6 +33,15 @@ builder.Services.AddScoped<IDossierService, DossierService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IFileStorageProvider, FileStorageProvider>();
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+}).AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddCors(options =>
 {
@@ -48,11 +62,15 @@ if (app.Environment.IsDevelopment())
 
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var appContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var authContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        context.Database.Migrate();
+        appContext.Database.Migrate();
+        authContext.Database.Migrate();
 
-        DbInitializer.Fixture(context);
+        DbInitializer.Fixture(appContext);
+        DbInitializer.Seed(userManager, authContext);
     }
 }
 

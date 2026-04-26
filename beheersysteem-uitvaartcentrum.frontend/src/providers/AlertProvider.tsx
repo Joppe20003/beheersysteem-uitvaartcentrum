@@ -8,7 +8,9 @@ export function AlertProvider({ children }: { children: ReactNode }) {
         setAlert({ message, type });
     };
 
-    const clearAlert = () => setAlert(null);
+    const clearAlert = () => {
+        setAlert(null);
+    }
 
     return (
         <AlertContext.Provider value= {{ alert, showAlert, clearAlert }}>

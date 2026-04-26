@@ -5,7 +5,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
     public class OverviewDossierDTO
     {
         public Guid Id { get; set; }
-
+        public Guid UserId { get; set; }
         public string Title { get; set; } = string.Empty;
     }
 }

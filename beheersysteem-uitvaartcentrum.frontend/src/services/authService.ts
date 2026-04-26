@@ -1,6 +1,6 @@
 import { BASE_URL } from "../constants/routes";
 
-class DossierService {
+class AuthService {
     private baseUrl: string;
 
     constructor(baseUrl: string) {
@@ -15,7 +15,12 @@ class DossierService {
             credentials: "include"
         });
 
-        if (!res.ok) throw res;
+        if (!res.ok) {
+            const error = await res.json();
+
+            throw error
+        }
+
         return res.json();
     }
 
@@ -26,21 +31,30 @@ class DossierService {
             credentials: "include"
         });
 
-        if (!res.ok) throw res;
+        if (!res.ok) {
+            const error = await res.json();
+
+            throw error
+        }
+
         return res.json();
     }
 
-    async create(data: unknown) {
-        return this.post("dossier", data);
+    async register(data: unknown) {
+        return this.post("auth/register", data);
     }
 
-    async getAll() {
-        return this.get("dossier");
+    async login(data: unknown) {
+        return this.post("auth/login", data);
     }
 
-    async getById(id: string) {
-        return this.get(`dossier/${id}`);
+    async logout() {
+        return this.post("auth/logout", {});
+    }
+
+    async status() {
+        return this.get("auth/status");
     }
 }
 
-export const dossierService = new DossierService(BASE_URL);
+export const authService = new AuthService(BASE_URL);

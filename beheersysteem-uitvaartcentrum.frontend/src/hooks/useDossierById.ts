@@ -22,10 +22,11 @@ function useDossierById(id: string) {
         if (!id) return;
 
         let cancelled = false;
-        setLoading(true);
 
         dossierService.getById(id)
             .then((data) => {
+                setLoading(true);
+
                 if (!cancelled) setDossier(data);
             })
             .catch((error) => {

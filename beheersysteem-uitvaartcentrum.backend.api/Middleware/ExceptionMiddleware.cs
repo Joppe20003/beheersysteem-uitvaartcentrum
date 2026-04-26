@@ -22,28 +22,14 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
                 context.Response.StatusCode = 410;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-                    title = notFoundForeignKey.Title,
-                    status = 410,
-                    errors = new { message = new[] { notFoundForeignKey.Message } },
-                    trace = context.TraceIdentifier
-                });
+                await context.Response.WriteAsync(notFoundForeignKey.Message);
             }
             catch (NotAllowedFileExtension notAllowedFileExtension)
             {
                 context.Response.StatusCode = 415;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.16",
-                    title = notAllowedFileExtension.Title,
-                    status = 415,
-                    errors = new { message = new[] { notAllowedFileExtension.Message } },
-                    trace = context.TraceIdentifier
-                });
+                await context.Response.WriteAsync(notAllowedFileExtension.Message);
             }
             catch (Exception exception)
             {

@@ -12,12 +12,10 @@ function useUploadDocument() {
 
         try {
             await documentService.upload(dossierId, file);
-        } catch (err: any) {
-            const message =
-                err?.errors?.message?.[0] ||
-                err?.title ||
-                err?.message ||
-                "Upload mislukt";
+        } catch (error: unknown) {
+            clearAlert();
+
+            const message = typeof error === "string" ? error : "Kan geen document uploaden, probeer dit later opnieuw";
 
             showAlert(message, "danger");
         } finally {

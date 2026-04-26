@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAlert } from "../../hooks/useAlert"
 
 import { documentService } from "../../services/documentService";
 
@@ -74,6 +73,7 @@ function View() {
     if (loading) {
         return (
             <section className="row">
+                <legend className="h1" tabIndex={0}>Dossiers detail</legend>
                 <p className="col-12 text-muted mt-4">Laden...</p>
             </section>
         );

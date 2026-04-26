@@ -2,11 +2,16 @@
 using beheersysteem_uitvaartcentrum.backend.api.Middleware;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
+using beheersysteem_uitvaartcentrum.backend.application.Security;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +28,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AppConnection"))
 );
-
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuthConnection"))
 );
@@ -33,6 +37,7 @@ builder.Services.AddScoped<IDossierService, DossierService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IFileStorageProvider, FileStorageProvider>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -40,8 +45,45 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 8;
-}).AddEntityFrameworkStores<AuthDbContext>();
+    options.Password.RequiredLength = 16;
+})
+.AddEntityFrameworkStores<AuthDbContext>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["X-Access-Token"];
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, OverViewDossierAuthorizationHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DossierAccess", policy =>
+        policy.Requirements.Add(new OverviewDossierAccessRequirement()));
+});
 
 builder.Services.AddCors(options =>
 {
@@ -49,35 +91,39 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var appContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var authContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    using (var scope = app.Services.CreateScope())
+
+    appContext.Database.Migrate();
+    authContext.Database.Migrate();
+
+    if (app.Environment.IsDevelopment())
     {
-        var appContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var authContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-        appContext.Database.Migrate();
-        authContext.Database.Migrate();
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         DbInitializer.Fixture(appContext);
-        DbInitializer.Seed(userManager, authContext);
     }
+
+    DbInitializer.Seed(userManager, authContext);
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

@@ -32,9 +32,9 @@ class AuthService {
         });
 
         if (!res.ok) {
-            const error = await res.json();
+            const errorData = await res.json().catch(() => ({ message: res.statusText }));
 
-            throw error
+            throw errorData;
         }
 
         return res.json();

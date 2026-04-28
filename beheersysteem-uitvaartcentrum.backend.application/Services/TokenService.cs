@@ -25,9 +25,13 @@ public class TokenService : ITokenService
 
         var claims = new List<Claim>
         {
-            new Claim("userId", user.Id),
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName!),
+            new Claim(ClaimTypes.Email, user.Email!),
+            new Claim("userId", user.Id),
+            new Claim("email", user.Email),
+            new Claim("username", user.UserName)
         };
 
         // ABAC: rollen als claims toevoegen

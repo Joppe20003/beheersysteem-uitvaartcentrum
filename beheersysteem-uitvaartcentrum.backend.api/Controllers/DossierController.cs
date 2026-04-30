@@ -2,7 +2,6 @@
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
@@ -22,9 +21,9 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid dossierId)
         {
-            ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(id);
+            ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(User, dossierId);
 
             if (viewDossierDTO == null)
             {
@@ -37,26 +36,9 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllDossiersAsync();
-            List<OverviewDossierDTO> authorizedDossiers = new List<OverviewDossierDTO>();
+            List<OverviewDossierDTO> dossiers = await _dossierService.GetAllDossiersAsync();
 
-            foreach (OverviewDossierDTO dossier in overviewDossierDTO)
-            {
-                AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, dossier, "DossierOverviewAccess");
-
-                if (authorizationResult.Succeeded)
-                {
-                    authorizedDossiers.Add(dossier);
-                }
-            }
-
-            var result = authorizedDossiers.Select(dossier => new
-            {
-                dossier.Id,
-                dossier.Title
-            });
-
-            return Ok(result);
+            return Ok(dossiers);
         }
         
         [HttpPost]
@@ -73,16 +55,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 Description = createDossierRequest.Description
             };
 
-            AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, createDossierDTO, "DossierCreate");
-
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
-            string userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-
-            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(createDossierDTO, userId);
+            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(User, createDossierDTO);
 
             return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
         }

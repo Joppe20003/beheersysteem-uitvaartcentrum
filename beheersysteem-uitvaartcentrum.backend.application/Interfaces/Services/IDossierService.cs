@@ -1,12 +1,12 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
-using beheersysteem_uitvaartcentrum.backend.domain.Models;
+using System.Security.Claims;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services
 {
     public interface IDossierService
     {
-        Task<ViewDossierDTO?> GetDossierAsync(Guid id);
+        Task<ViewDossierDTO?> GetDossierAsync(ClaimsPrincipal user, Guid dossierId);
         Task<List<OverviewDossierDTO>> GetAllDossiersAsync();
-        Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto, string userId);
+        Task<ViewDossierDTO> CreateDossierAsync(ClaimsPrincipal user, CreateDossierDTO createDossierDTO);
     }
 }

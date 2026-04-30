@@ -80,12 +80,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IAuthorizationHandler, DossierOverviewAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, DossierAccessAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, DossierCreateAuthorizationHandler>();
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DossierOverviewAccess", policy =>
-        policy.Requirements.Add(new DossierOverviewAccessRequirement()));
+    options.AddPolicy("DossierAccess", policy =>
+        policy.Requirements.Add(new DossierAccessRequirement()));
     options.AddPolicy("DossierCreate", policy =>
         policy.Requirements.Add(new DossierCreateRequirement()));
 });

@@ -1,11 +1,12 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
+using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Security
 {
-    public class DossierOverviewAuthorizationHandler : AuthorizationHandler<DossierOverviewAccessRequirement, OverviewDossierDTO>
+    public class DossierAccessAuthorizationHandler : AuthorizationHandler<DossierAccessRequirement, DossierModel>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DossierOverviewAccessRequirement requirement, OverviewDossierDTO resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DossierAccessRequirement requirement, DossierModel resource)
         {
             string? userId = context.User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
@@ -21,7 +22,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Security
                 return Task.CompletedTask;
             }
 
-            if (userId != null && resource.InvitedUserIds.Contains(Guid.Parse(userId)))
+            if (userId != null && resource.InvitedUsers.Any(u => u.UserId == Guid.Parse(userId)))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

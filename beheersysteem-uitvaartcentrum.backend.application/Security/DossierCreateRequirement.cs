@@ -2,5 +2,5 @@
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Security
 {
-    public class OverviewDossierAccessRequirement : IAuthorizationRequirement { }
+    public class DossierCreateRequirement : IAuthorizationRequirement { }
 }

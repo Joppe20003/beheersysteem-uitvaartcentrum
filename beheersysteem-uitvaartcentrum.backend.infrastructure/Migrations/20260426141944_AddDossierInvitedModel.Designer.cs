@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
@@ -11,9 +12,11 @@ using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260426141944_AddDossierInvitedModel")]
+    partial class AddDossierInvitedModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,19 +55,6 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                     b.ToTable("Documents");
                 });
 
-            modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierInvitedModel", b =>
-                {
-                    b.Property<Guid>("DossierId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("DossierId", "UserId");
-
-                    b.ToTable("DossierInvited");
-                });
-
             modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -100,22 +90,9 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                     b.Navigation("Dossier");
                 });
 
-            modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierInvitedModel", b =>
-                {
-                    b.HasOne("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", "Dossier")
-                        .WithMany("InvitedUsers")
-                        .HasForeignKey("DossierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dossier");
-                });
-
             modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", b =>
                 {
                     b.Navigation("Documents");
-
-                    b.Navigation("InvitedUsers");
                 });
 #pragma warning restore 612, 618
         }

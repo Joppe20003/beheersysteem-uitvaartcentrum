@@ -38,7 +38,7 @@ public class DocumentService : IDocumentService
         return viewDocumentDTO;
     }
 
-    public async Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO dto)
+    public async Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO dto, string userId)
     {
         await CheckDossierIdExists(dto.DossierId);
 
@@ -66,6 +66,7 @@ public class DocumentService : IDocumentService
         DocumentModel model = new DocumentModel
         {
             Id = Guid.NewGuid(),
+            UserId = Guid.Parse(userId),
             DossierId = dto.DossierId,
             Title = dto.FileName,
             Extensions = Path.GetExtension(dto.FileName),

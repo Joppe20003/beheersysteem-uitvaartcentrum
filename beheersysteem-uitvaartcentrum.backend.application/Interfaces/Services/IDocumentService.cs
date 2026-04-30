@@ -7,7 +7,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services
     public interface IDocumentService
     {
         public Task<ViewDocumentDTO?> GetDocumentAsync(Guid id);
-        public Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO uploadDossierFileDTO);
+        public Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO uploadDossierFileDTO, string userId);
         public Task<DownloadDocumentDTO?> DownloadDocumentAsync(Guid id);
     }
 }

@@ -3,19 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Security
 {
-    public class OverViewDossierAuthorizationHandler : AuthorizationHandler<OverviewDossierAccessRequirement, OverviewDossierDTO>
+    public class DossierCreateAuthorizationHandler : AuthorizationHandler<DossierCreateRequirement, CreateDossierDTO>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OverviewDossierAccessRequirement requirement, OverviewDossierDTO resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DossierCreateRequirement requirement, CreateDossierDTO resource)
         {
-            string? userId = context.User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-
             if (context.User.IsInRole("Admin"))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;
             }
-            
-            if (userId == resource.UserId.ToString())
+
+            if (context.User.IsInRole("UitvaartOndernemer"))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

@@ -10,7 +10,31 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Data
         {
             if (!appContext.Dossiers.Any())
             {
-                // Add sample dossiers
+                appContext.AddRange(
+                    new DossierModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Dossier 1",
+                        Description = "Beschrijving van dossier 1",
+                        DateCreated = DateTime.UtcNow
+                    },
+                    new DossierModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Dossier 2",
+                        Description = "Beschrijving van dossier 2",
+                        DateCreated = DateTime.UtcNow
+                    },
+                    new DossierModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Dossier 3",
+                        Description = "Beschrijving van dossier 3",
+                        DateCreated = DateTime.UtcNow
+                    }
+                );
+
+                appContext.SaveChanges();
             }
         }
 
@@ -19,7 +43,7 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Data
         {
             if (!authContext.Roles.Any())
             {
-                foreach (Roles role in Enum.GetValues<Roles>())
+                foreach (Roles role in Enum.GetValues(typeof(Roles)))
                 {
                     authContext.Roles.Add(new IdentityRole { Name = role.ToString(), NormalizedName = role.ToString().ToUpper() });
                 }

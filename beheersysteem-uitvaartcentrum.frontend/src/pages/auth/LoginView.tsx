@@ -1,18 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../hooks/useAlert";
-import { useAuth } from "../../hooks/useAuth";
 import { authService } from "../../services/authService";
 import LoginForm from "../../components/forms/LoginUserForm";
 
 function LoginView() {
     const navigate = useNavigate();
-    const { refreshStatus } = useAuth();
     const { showAlert, clearAlert } = useAlert();
 
     const handleSubmit = async (data: { email: string; password: string }) => {
         try {
             await authService.login(data);
-            await refreshStatus();
 
             showAlert("Ingelogd!", "success");
             navigate("/");

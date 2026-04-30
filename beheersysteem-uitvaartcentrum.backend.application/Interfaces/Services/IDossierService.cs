@@ -7,6 +7,6 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services
     {
         Task<ViewDossierDTO?> GetDossierAsync(Guid id);
         Task<List<OverviewDossierDTO>> GetAllDossiersAsync();
-        Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto, string userId);
+        Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto);
     }
 }

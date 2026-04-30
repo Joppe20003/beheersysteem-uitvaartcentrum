@@ -2,14 +2,12 @@
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
     public class DossierController : ControllerBase
     {
         private readonly IDossierService _dossierService;
@@ -35,6 +33,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllDossiersAsync();
@@ -42,7 +41,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 
             foreach (OverviewDossierDTO dossier in overviewDossierDTO)
             {
-                AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, dossier, "DossierOverviewAccess");
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, dossier, "DossierAccess");
 
                 if (authorizationResult.Succeeded)
                 {
@@ -72,17 +71,8 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 Title = createDossierRequest.Title,
                 Description = createDossierRequest.Description
             };
-
-            AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, createDossierDTO, "DossierCreate");
-
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
-            string userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-
-            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(createDossierDTO, userId);
+            
+            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(createDossierDTO);
 
             return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
         }

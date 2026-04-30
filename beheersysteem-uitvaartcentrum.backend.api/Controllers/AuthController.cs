@@ -1,6 +1,5 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Auth;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
-using beheersysteem_uitvaartcentrum.backend.application.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +41,7 @@ public class AuthController : ControllerBase
 
         IdentityUser user = new IdentityUser
         {
-            UserName = dto.Username,
+            UserName = dto.Email,
             Email = dto.Email
         };
         IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
@@ -65,7 +64,7 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
+        var user = await _userManager.FindByEmailAsync(dto.Email);
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password)) return BadRequest(new { message = "Ongeldige inloggegevens." });
 
@@ -102,22 +101,20 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Uitgelogd." });
     }
 
+    [Authorize]
     [HttpGet("status")]
     public async Task<IActionResult> GetStatus()
     {
-        IdentityUser? user = await _userManager.GetUserAsync(User);
-
+        var user = await _userManager.GetUserAsync(User);
         if (user == null) return Unauthorized();
 
-        IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
-        List<string> actions = RolePermissions.GetActionsForRoles(roles.ToList());
-
+        var roles = await _userManager.GetRolesAsync(user);
         return Ok(new
         {
             isAuthenticated = true,
-            username = user.UserName,
-            role = roles,
-            actions = actions
+            userId = user.Id,
+            email = user.Email,
+            roles
         });
     }
 }

@@ -46,8 +46,6 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 16;
-
-    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 })
 .AddEntityFrameworkStores<AuthDbContext>();
 
@@ -80,14 +78,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IAuthorizationHandler, DossierOverviewAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, DossierCreateAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, OverViewDossierAuthorizationHandler>();
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DossierOverviewAccess", policy =>
-        policy.Requirements.Add(new DossierOverviewAccessRequirement()));
-    options.AddPolicy("DossierCreate", policy =>
-        policy.Requirements.Add(new DossierCreateRequirement()));
+    options.AddPolicy("DossierAccess", policy =>
+        policy.Requirements.Add(new OverviewDossierAccessRequirement()));
 });
 
 builder.Services.AddCors(options =>

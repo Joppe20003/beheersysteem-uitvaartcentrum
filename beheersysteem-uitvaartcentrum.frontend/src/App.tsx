@@ -12,15 +12,10 @@ import RegisterView from "./pages/auth/RegisterView";
 
 import Create from "./pages/dossiers/Create";
 
-import ProtectedComponent from "./components/shared/ProtectedComponent";
-
 function App() {
     return (
         <Routes>
-            <Route element={
-                <ProtectedComponent>
-                    <MainLayout />
-                </ProtectedComponent>}>
+            <Route element={<MainLayout />}>
                 <Route path="/" element={<Navigate to="dossiers" replace />} />
 
                 <Route path="dossiers">

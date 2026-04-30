@@ -45,19 +45,16 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             List<OverviewDossierDTO> overviewDossierDTO = dossierModels.Select(dossierModel => new OverviewDossierDTO
             {
                 Id = dossierModel.Id,
-                Title = dossierModel.Title,
-                UserId = dossierModel.UserId,
-                InvitedUserIds = dossierModel.InvitedUsers.Select(i => i.UserId).ToList()
+                Title = dossierModel.Title
             }).ToList();
 
             return overviewDossierDTO;
         }
-        public async Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto, string userId)
+        public async Task<ViewDossierDTO> CreateDossierAsync(CreateDossierDTO dto)
         {
             DossierModel dossierModel = new DossierModel
             {
                 Title = dto.Title,
-                UserId = Guid.Parse(userId),
                 Description = dto.Description
             };
 

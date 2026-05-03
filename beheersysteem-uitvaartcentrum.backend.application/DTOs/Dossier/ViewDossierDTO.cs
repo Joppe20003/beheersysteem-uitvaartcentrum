@@ -1,4 +1,5 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
+using beheersysteem_uitvaartcentrum.backend.application.DTOs.User;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
 {
@@ -13,5 +14,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier
         public DateTime DateCreated { get; set; }
 
         public List<ViewDocumentDTO> Documents { get; set; } = null!;
+
+        public List<InvitedUserDTO> InvitedUsers { get; set; } = null!;
     }
 }

@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useRef, useEffect } from "react";
 import { useForm } from "../../hooks/useForm";
 import { createUserSchema } from "../../constants/schemas";
@@ -107,6 +109,11 @@ function RegisterUserForm({ onSubmit }: RegisterUserFormProps) {
                         <FieldError errors={errors.password} />
                     </span>
                 </div>
+
+                <p className="mb-3">
+                    Al een account? <a href="/login">Login hier in</a>.
+                </p>
+
                 <button type="submit" className="btn btn-primary mb-3 w-100" disabled={isLoading}>
                     {isLoading ? "Bezig met aanmaken..." : "Account aanmaken"}
                 </button>

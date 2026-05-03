@@ -116,6 +116,7 @@ public class AuthController : ControllerBase
         {
             isAuthenticated = true,
             username = user.UserName,
+            userId = user.Id,
             role = roles,
             actions = actions
         });

@@ -17,6 +17,13 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
             {
                 await _next(context);
             }
+            catch (ForbiddenException forbiddenException)
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync(forbiddenException.Message);
+            }
             catch (NotFoundForeignKey notFoundForeignKey)
             {
                 context.Response.StatusCode = 410;

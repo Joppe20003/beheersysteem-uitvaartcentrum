@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useRef, useEffect } from "react";
 import { useForm } from "../../hooks/useForm";
 import { loginSchema, LoginValues } from "../../constants/schemas";
@@ -16,7 +18,6 @@ function LoginForm({ onSubmit }: LoginFormProps) {
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
 
-    // Focus management: focus het eerste veld met een foutmelding
     useEffect(() => {
         if (errors.password?.length) {
             passwordRef.current?.focus();
@@ -70,6 +71,10 @@ function LoginForm({ onSubmit }: LoginFormProps) {
                         <FieldError errors={errors.password} />
                     </span>
                 </div>
+
+                <p className="mb-3">
+                    Nog geen account? <a href="/registreren">Registreer hier</a>.
+                </p>
 
                 <button type="submit" className="btn btn-primary mb-3 w-100" disabled={isLoading}>
                     {isLoading ? "Bezig met inloggen..." : "Inloggen"}

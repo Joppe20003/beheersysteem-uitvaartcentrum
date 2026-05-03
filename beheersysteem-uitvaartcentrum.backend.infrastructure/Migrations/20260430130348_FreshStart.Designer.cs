@@ -12,8 +12,8 @@ using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260426141944_AddDossierInvitedModel")]
-    partial class AddDossierInvitedModel
+    [Migration("20260430130348_FreshStart")]
+    partial class FreshStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,6 +55,19 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierInvitedModel", b =>
+                {
+                    b.Property<Guid>("DossierId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("DossierId", "UserId");
+
+                    b.ToTable("DossierInvited");
+                });
+
             modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -90,9 +103,22 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                     b.Navigation("Dossier");
                 });
 
+            modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierInvitedModel", b =>
+                {
+                    b.HasOne("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", "Dossier")
+                        .WithMany("InvitedUsers")
+                        .HasForeignKey("DossierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dossier");
+                });
+
             modelBuilder.Entity("beheersysteem_uitvaartcentrum.backend.domain.Models.DossierModel", b =>
                 {
                     b.Navigation("Documents");
+
+                    b.Navigation("InvitedUsers");
                 });
 #pragma warning restore 612, 618
         }

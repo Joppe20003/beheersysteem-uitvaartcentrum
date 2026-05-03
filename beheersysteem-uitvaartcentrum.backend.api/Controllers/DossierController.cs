@@ -2,7 +2,6 @@
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
@@ -13,18 +12,16 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
     public class DossierController : ControllerBase
     {
         private readonly IDossierService _dossierService;
-        private readonly IAuthorizationService _authorizationService;
 
-        public DossierController(IDossierService dossierService, IAuthorizationService authorizationService)
+        public DossierController(IDossierService dossierService)
         {
             _dossierService = dossierService;
-            _authorizationService = authorizationService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [HttpGet("{dossierId}")]
+        public async Task<IActionResult> GetById(Guid dossierId)
         {
-            ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(id);
+            ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(User, dossierId);
 
             if (viewDossierDTO == null)
             {
@@ -37,29 +34,12 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<OverviewDossierDTO> overviewDossierDTO = await _dossierService.GetAllDossiersAsync();
-            List<OverviewDossierDTO> authorizedDossiers = new List<OverviewDossierDTO>();
+            List<OverviewDossierDTO> dossiers = await _dossierService.GetAllDossiersAsync(User);
 
-            foreach (OverviewDossierDTO dossier in overviewDossierDTO)
-            {
-                AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, dossier, "DossierOverviewAccess");
-
-                if (authorizationResult.Succeeded)
-                {
-                    authorizedDossiers.Add(dossier);
-                }
-            }
-
-            var result = authorizedDossiers.Select(dossier => new
-            {
-                dossier.Id,
-                dossier.Title
-            });
-
-            return Ok(result);
+            return Ok(dossiers);
         }
-        
-        [HttpPost]
+
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateDossierRequest createDossierRequest)
         {
             if (!ModelState.IsValid)
@@ -73,19 +53,22 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 Description = createDossierRequest.Description
             };
 
-            AuthorizationResult? authorizationResult = await _authorizationService.AuthorizeAsync(User, createDossierDTO, "DossierCreate");
+            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(User, createDossierDTO);
 
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
-            string userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-
-            ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(createDossierDTO, userId);
-
-            return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
+            return CreatedAtAction(nameof(GetById), new { dossierId = viewDossierDTO.Id }, viewDossierDTO);
         }
 
+        [HttpPost("invite")]
+        public async Task<IActionResult> Invite([FromBody] InviteDossierRequest inviteDossierRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _dossierService.InviteUserToDossierAsync(User, inviteDossierRequest.DossierId, inviteDossierRequest.TargetedUserId);
+
+            return NoContent();
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet("{id}/download")]
         public async Task<IActionResult> Download(Guid id)
         {
-            DownloadDocumentDTO? downloadDocumentDTO = await _documentService.DownloadDocumentAsync(id);
+            DownloadDocumentDTO? downloadDocumentDTO = await _documentService.DownloadDocumentAsync(User, id);
 
             if (downloadDocumentDTO == null)
             {
@@ -63,7 +63,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 
             string userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
-            ViewDocumentDTO viewDocumentDTO = await _documentService.UploadDocumentAsync(uploadDocumentDTO, userId);
+            ViewDocumentDTO viewDocumentDTO = await _documentService.UploadDocumentAsync(User, uploadDocumentDTO);
 
             return CreatedAtAction(nameof(Get), new { id = viewDocumentDTO.Id }, viewDocumentDTO);
         }

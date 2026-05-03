@@ -32,5 +32,12 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories
 
             return dossier;
         }
+
+        public async Task InviteUserToDossierAsync(DossierInvitedModel dossierInvitedModel)
+        {
+            _appDbContext.DossierInvited.Add(dossierInvitedModel);
+
+            await _appDbContext.SaveChangesAsync();
+        }
     }
 }

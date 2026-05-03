@@ -32,6 +32,7 @@ class DocumentService {
     async download(id: string) {
         return fetch(this.baseUrl + `Document/${id}/download`, {
             method: "GET",
+            credentials: "include"
         }).then((res) => {
             if (!res.ok) throw res;
             return res.blob();

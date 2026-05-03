@@ -1,4 +1,5 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Dossier;
+using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Security

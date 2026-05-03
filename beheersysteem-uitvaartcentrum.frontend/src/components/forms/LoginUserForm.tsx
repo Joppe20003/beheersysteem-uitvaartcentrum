@@ -18,7 +18,6 @@ function LoginForm({ onSubmit }: LoginFormProps) {
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
 
-    // Focus management: focus het eerste veld met een foutmelding
     useEffect(() => {
         if (errors.password?.length) {
             passwordRef.current?.focus();

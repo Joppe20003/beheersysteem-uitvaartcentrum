@@ -6,7 +6,8 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services
     public interface IDossierService
     {
         Task<ViewDossierDTO?> GetDossierAsync(ClaimsPrincipal user, Guid dossierId);
-        Task<List<OverviewDossierDTO>> GetAllDossiersAsync();
+        Task<List<OverviewDossierDTO>> GetAllDossiersAsync(ClaimsPrincipal user);
         Task<ViewDossierDTO> CreateDossierAsync(ClaimsPrincipal user, CreateDossierDTO createDossierDTO);
+        Task InviteUserToDossierAsync(ClaimsPrincipal user, Guid dossierId, Guid targetedUserId);
     }
 }

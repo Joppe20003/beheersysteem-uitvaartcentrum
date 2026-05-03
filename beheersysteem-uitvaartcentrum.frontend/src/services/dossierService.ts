@@ -30,8 +30,12 @@ class DossierService {
         return res.json();
     }
 
+    async invite(data: unknown) {
+        return this.post("dossier/invite", data);
+    }
+
     async create(data: unknown) {
-        return this.post("dossier", data);
+        return this.post("dossier/create", data);
     }
 
     async getAll() {

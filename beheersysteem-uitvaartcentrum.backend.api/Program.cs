@@ -88,6 +88,8 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new DossierAccessRequirement()));
     options.AddPolicy("DossierCreate", policy =>
         policy.Requirements.Add(new DossierCreateRequirement()));
+    options.AddPolicy("DossierInvite", policy =>
+        policy.Requirements.Add(new DossierInviteRequirement()));
 });
 
 builder.Services.AddCors(options =>

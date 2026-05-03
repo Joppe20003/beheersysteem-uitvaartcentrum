@@ -4,8 +4,8 @@
     {
         private static readonly Dictionary<string, List<string>> _permissions = new()
         {
-            { "Admin", new List<string> { "dossier:create", "dossier:overview", "dossier:view, dossier:invite"} },
-            { "UitvaartOndernemer", new List<string> { "dossier:create", "dossier:overview", "dossier:view, dossier:invite" } },
+            { "Admin", new List<string> { "dossier:create", "dossier:overview", "dossier:view, dossier:invite" } },
+            { "UitvaartOndernemer", new List<string> { "dossier:create", "dossier:overview", "dossier:view" } },
             { "Externe", new List<string> { "dossier:overview", "dossier:view" } }
         };
 

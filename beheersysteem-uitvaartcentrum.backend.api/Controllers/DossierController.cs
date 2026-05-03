@@ -12,15 +12,13 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
     public class DossierController : ControllerBase
     {
         private readonly IDossierService _dossierService;
-        private readonly IAuthorizationService _authorizationService;
 
-        public DossierController(IDossierService dossierService, IAuthorizationService authorizationService)
+        public DossierController(IDossierService dossierService)
         {
             _dossierService = dossierService;
-            _authorizationService = authorizationService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{dossierId}")]
         public async Task<IActionResult> GetById(Guid dossierId)
         {
             ViewDossierDTO? viewDossierDTO = await _dossierService.GetDossierAsync(User, dossierId);
@@ -36,12 +34,12 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<OverviewDossierDTO> dossiers = await _dossierService.GetAllDossiersAsync();
+            List<OverviewDossierDTO> dossiers = await _dossierService.GetAllDossiersAsync(User);
 
             return Ok(dossiers);
         }
-        
-        [HttpPost]
+
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateDossierRequest createDossierRequest)
         {
             if (!ModelState.IsValid)
@@ -57,8 +55,20 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 
             ViewDossierDTO viewDossierDTO = await _dossierService.CreateDossierAsync(User, createDossierDTO);
 
-            return CreatedAtAction(nameof(GetById), new { id = viewDossierDTO.Id }, viewDossierDTO);
+            return CreatedAtAction(nameof(GetById), new { dossierId = viewDossierDTO.Id }, viewDossierDTO);
         }
 
+        [HttpPost("invite")]
+        public async Task<IActionResult> Invite([FromBody] InviteDossierRequest inviteDossierRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _dossierService.InviteUserToDossierAsync(User, inviteDossierRequest.DossierId, inviteDossierRequest.TargetedUserId);
+
+            return NoContent();
+        }
     }
 }

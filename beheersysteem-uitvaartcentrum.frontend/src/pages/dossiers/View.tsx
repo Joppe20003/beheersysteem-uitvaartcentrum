@@ -9,12 +9,14 @@ import useUploadDocument from "../../hooks/useUploadDocument";
 import Table, { ColumnDef } from "../../components/shared/Table";
 
 import { ACCEPTED_FILE_EXSTENSIONS } from "../../constants/files"
+import { useAuth } from "../../hooks/useAuth";
 
 function View() {
     const navigate = useNavigate();
     const { id } = useParams();
     const { dossier, refetch, loading } = useDossierById(id!);
     const { upload, uploading } = useUploadDocument();
+    const { user } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +41,10 @@ function View() {
         a.click();
         URL.revokeObjectURL(url);
     };
+
+    const handleAddUserToDossierClick = () => {
+        console.log("hoi");
+    }
 
     const columns: ColumnDef[] = [
         {
@@ -120,6 +126,14 @@ function View() {
                 <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Beschrijving niet aanwezig"}</p>
                 <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
                 <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
+                {user?.role == "Admin" || user?.id == dossier?.userId && (
+                    <>
+                        <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang ({ dossier?.invitedUsers.length })</p>
+                        <div className="row">
+                            <i className="col-auto bi bi-plus-circle-fill mb-2" style={{ fontSize: "2rem", color: "rgb(0, 192, 255)" }} onClick={handleAddUserToDossierClick} tabIndex={0} />
+                        </div>
+                    </>
+                )}
                 <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden: (toegestaande extensies: PDF, JPG, JPEG, PNG)</p>
                 <Table data={dossier?.documents || []} columns={columns} noResultsText="Geen gekoppelde bestanden bij dit dossier" />
             </article>

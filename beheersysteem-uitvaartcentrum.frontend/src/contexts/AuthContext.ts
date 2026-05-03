@@ -5,6 +5,7 @@ export interface UserStatus {
     username: string;
     actions: string[];
     role: string;
+    id: string;
 }
 
 export interface AuthContextType {

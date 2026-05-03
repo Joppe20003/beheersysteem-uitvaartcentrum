@@ -4,6 +4,8 @@ import { dossierService } from "../services/dossierService";
 
 type Dossier = {
     id: string;
+    userId: string;
+    invitedUsers: string[];
     title: string;
     description?: string;
     dateCreated: string;

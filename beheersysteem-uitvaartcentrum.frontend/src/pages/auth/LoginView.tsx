@@ -19,8 +19,10 @@ function LoginView() {
         } catch (error: unknown) {
             clearAlert();
 
-            if (typeof error === "object" && error !== null && "message" in error) {
-                showAlert((error as { message: string }).message, "danger");
+            const errorMessage = (error instanceof Error) ? error.message : (typeof error === "object" && error !== null && "message" in error) ? (error as { message: string }).message : null;
+
+            if (errorMessage && errorMessage !== "Failed to fetch") {
+                showAlert(errorMessage, "danger");
             } else {
                 showAlert("Kan geen account aanmaken, probeer dit later opnieuw", "danger");
             }

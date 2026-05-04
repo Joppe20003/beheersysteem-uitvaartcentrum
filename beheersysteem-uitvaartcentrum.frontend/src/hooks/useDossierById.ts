@@ -2,10 +2,15 @@
 import { useNavigate } from "react-router-dom";
 import { dossierService } from "../services/dossierService";
 
+type InvitedUser = {
+    userId: string;
+    userName: string;
+};
+
 type Dossier = {
     id: string;
     userId: string;
-    invitedUsers: string[];
+    invitedUsers: InvitedUser[];
     title: string;
     description?: string;
     dateCreated: string;

@@ -6,10 +6,14 @@ import { documentService } from "../../services/documentService";
 import dateFormatter from "../../utils/shared/dateFormatter";
 import useDossierById from "../../hooks/useDossierById";
 import useUploadDocument from "../../hooks/useUploadDocument";
+
 import Table, { ColumnDef } from "../../components/shared/Table";
 
 import { ACCEPTED_FILE_EXSTENSIONS } from "../../constants/files"
+
 import { useAuth } from "../../hooks/useAuth";
+
+import nameFormatter from "../../utils/shared/nameFormatter"
 
 function View() {
     const navigate = useNavigate();
@@ -128,9 +132,49 @@ function View() {
                 <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
                 {user?.role == "Admin" || user?.id == dossier?.userId && (
                     <>
-                        <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang ({ dossier?.invitedUsers.length })</p>
-                        <div className="row">
-                            <i className="col-auto bi bi-plus-circle-fill mb-2" style={{ fontSize: "2rem", color: "rgb(0, 192, 255)" }} onClick={handleAddUserToDossierClick} tabIndex={0} />
+                        <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang ({dossier?.invitedUsers.length})</p>
+                        <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
+                            {dossier?.invitedUsers.map((invitedUser) => (
+                                <div
+                                    key={invitedUser.userId}
+                                    className="col-auto d-flex align-items-center justify-content-center shadow-sm"
+                                    style={{
+                                        height: "45px",
+                                        width: "45px",
+                                        borderRadius: "50%",
+                                        backgroundColor: "#e3f2fd",
+                                        border: "2px solid rgb(0, 192, 255)",
+                                        color: "rgb(0, 192, 255)",
+                                        fontSize: "0.9rem",
+                                        fontWeight: "bold",
+                                        position: "relative",
+                                        cursor: "pointer"
+                                    }}
+                                    tabIndex={0}
+                                    role="img"
+                                    aria-label={`Toegang voor: ${invitedUser.userName}`}
+                                    title={invitedUser.userName}
+                                >
+                                    { nameFormatter(invitedUser.userName) }
+                                </div>
+                            ))}
+                            <button
+                                className="col-auto btn d-flex align-items-center justify-content-center shadow-sm"
+                                onClick={handleAddUserToDossierClick}
+                                style={{
+                                    height: "45px",
+                                    width: "45px",
+                                    borderRadius: "50%",
+                                    border: "2px dashed rgb(0, 192, 255)",
+                                    backgroundColor: "transparent",
+                                    color: "rgb(0, 192, 255)",
+                                    transition: "all 0.2s ease"
+                                }}
+                                aria-label="Nieuwe gebruiker uitnodigen voor dit dossier"
+                                title="Gebruiker toevoegen"
+                            >
+                                <i className="bi bi-person-plus-fill" style={{ fontSize: "1.2rem" }} />
+                            </button>
                         </div>
                     </>
                 )}

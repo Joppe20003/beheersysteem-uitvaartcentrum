@@ -16,7 +16,7 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories
 
         public async Task<DossierModel?> GetDossierAsync(Guid id)
         {
-            return await _appDbContext.Dossiers.Include(d => d.Documents).FirstOrDefaultAsync(d => d.Id == id);
+            return await _appDbContext.Dossiers.Include(document => document.Documents).Include(invitedUser => invitedUser.InvitedUsers).FirstOrDefaultAsync(d => d.Id == id);
         }
 
         public async Task<List<DossierModel>> GetAllDossiersAsync()

@@ -6,17 +6,20 @@ using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace beheersysteem_uitvaartcentrum.backend.application.Services
 {
     public class DossierService : IDossierService
     {
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly IDossierRepository _dossierRepository;
         private readonly IAuthorizationService _authorizationService;
 
-        public DossierService(IDossierRepository dossierRepository, IAuthorizationService authorizationService)
+        public DossierService(UserManager<IdentityUser> userManager, IDossierRepository dossierRepository, IAuthorizationService authorizationService)
         {
+            _userManager = userManager;
             _dossierRepository = dossierRepository;
             _authorizationService = authorizationService;
         }
@@ -44,7 +47,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 InvitedUsers = dossierModel.InvitedUsers.Select(invitedUser => new InvitedUserDTO
                 {
                     UserId = invitedUser.UserId,
-                    UserName = invitedUser.User.UserName
+                    UserName = _userManager.FindByIdAsync(invitedUser.UserId.ToString()).Result.UserName
                 }).ToList()
             };
 

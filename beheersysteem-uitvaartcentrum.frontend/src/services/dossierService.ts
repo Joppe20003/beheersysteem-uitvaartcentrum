@@ -15,7 +15,18 @@ class DossierService {
             credentials: "include"
         });
 
-        if (!res.ok) throw res;
+        console.log("POST", endpoint, data, res);
+
+        if (!res.ok) {
+            const error = await res.json();
+
+            throw error
+        }
+
+        if (res.status == 204) {
+            return null;
+        }
+
         return res.json();
     }
 

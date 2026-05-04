@@ -23,6 +23,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             _dossierRepository = dossierRepository;
             _authorizationService = authorizationService;
         }
+
         public async Task<ViewDossierDTO?> GetDossierAsync(ClaimsPrincipal user, Guid dossierId)
         {
             DossierModel? dossierModel = await _dossierRepository.GetDossierAsync(dossierId);
@@ -47,7 +48,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 InvitedUsers = dossierModel.InvitedUsers.Select(invitedUser => new InvitedUserDTO
                 {
                     UserId = invitedUser.UserId,
-                    UserName = _userManager.FindByIdAsync(invitedUser.UserId.ToString()).Result.UserName
+                    UserName = _userManager.FindByIdAsync(invitedUser.UserId.ToString()).Result?.UserName ?? string.Empty
                 }).ToList()
             };
 
@@ -70,6 +71,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
 
             return overviewDossierDTO;
         }
+
         public async Task<ViewDossierDTO> CreateDossierAsync(ClaimsPrincipal user, CreateDossierDTO createDossierDTO)
         {
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, createDossierDTO, "DossierCreate");
@@ -113,6 +115,11 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, dossierModel, "DossierInvite");
 
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen rechten om mensen uit te nodigen op dit dossier");
+
+            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId))
+            {
+                throw new AlreadyExistsException("Gebruiker is al uitgenodigd voor dit dossier.");
+            }
 
             DossierInvitedModel dossierInvitedModel = new DossierInvitedModel
             {

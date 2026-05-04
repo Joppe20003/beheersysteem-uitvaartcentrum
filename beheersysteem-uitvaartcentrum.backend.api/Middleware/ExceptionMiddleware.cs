@@ -38,6 +38,13 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
 
                 await context.Response.WriteAsJsonAsync(notAllowedFileExtension.Message);
             }
+            catch (AlreadyExistsException alreadyExists)
+            {
+                context.Response.StatusCode = 409;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsJsonAsync(new { Message = alreadyExists.Message });
+            }
             catch (Exception exception)
             {
                 context.Response.StatusCode = 500;

@@ -14,26 +14,6 @@ type UserOverview = {
     userName?: string | null;
 };
 
-function extractMessageFromError(err: unknown) {
-    if (!err) return null;
-
-    if (typeof err === 'string') return err;
-
-    if (typeof err === 'object') {
-        const anyErr = err as any;
-        if (typeof anyErr.message === 'string') return anyErr.message;
-        if (anyErr.errors && anyErr.errors.message) {
-            const m = anyErr.errors.message;
-            if (Array.isArray(m)) return m.join('\n');
-            if (typeof m === 'string') return m;
-        }
-        if (typeof anyErr.title === 'string') return anyErr.title;
-        if (typeof anyErr.error === 'string') return anyErr.error;
-    }
-
-    return null;
-}
-
 function PeopleSelector({ dossierId, onInviteComplete, onClose }: PeopleSelectorProps) {
     const [users, setUsers] = useState<UserOverview[]>([]);
     const [query, setQuery] = useState("");

@@ -102,7 +102,6 @@ function View() {
                         <div className="d-flex" style={{ height: "stretch" }}>
                             <button
                                 className="btn btn-outline-primary mx-2 px-5"
-                                style={{ height: "stretch", fontSize: "1.25rem" }}
                                 onClick={() => navigate(-1)}
                             >
                                 Terug
@@ -110,11 +109,7 @@ function View() {
 
                             <button
                                 className="btn btn-primary px-5"
-                                style={{
-                                    height: "stretch",
-                                    width: "max-content",
-                                    fontSize: "1.25rem",
-                                }}
+                                style={{ width: "max-content" }}
                                 disabled={uploading}
                                 onClick={() => fileInputRef.current?.click()}
                             >

@@ -41,8 +41,8 @@ function Header() {
                             <Link className="header-item text-black text-decoration-none py-2 px-3" to="/dossiers" onClick={() => setIsMenuOpen(false)}>Dossiers</Link>
 
                             <div className="mt-3 border-top pt-3">
-                                <div className="header-item-name">{ user?.username }</div>
-                                <div className="header-item-role">{ roleFormatter(user?.role[0]) }</div>
+                                <div className="header-item-name">{user?.username}</div>
+                                <div className="header-item-role">{roleFormatter(user?.role[0])}</div>
                                 <div className="mt-2">
                                     <button className="btn btn-danger w-100 mt-3" onClick={() => { onClickLogOut(); setIsMenuOpen(false); }}>Uitloggen</button>
                                 </div>
@@ -53,8 +53,8 @@ function Header() {
             )}
 
             <div className="col-auto ms-auto border-start d-flex flex-column justify-content-center px-3 d-none d-md-flex">
-                <div className="header-item-name">{ user?.username }</div>
-                <div className="header-item-role">{ roleFormatter(user?.role[0]) }</div>
+                <div className="header-item-name">{user?.username}</div>
+                <div className="header-item-role">{roleFormatter(user?.role[0])}</div>
             </div>
             <button className="btn col-auto bi bi-x-circle-fill d-none d-md-block" style={{ fontSize: "2rem", color: "#00c0ff" }} aria-label="Uitloggen knop" onClick={onClickLogOut} />
         </div>

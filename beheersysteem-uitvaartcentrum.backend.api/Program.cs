@@ -82,6 +82,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<IAuthorizationHandler, DossierAccessAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, DossierCreateAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, DossierInviteAuthorizationHandler>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("DossierAccess", policy =>

@@ -22,21 +22,28 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
                 context.Response.StatusCode = 403;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsync(forbiddenException.Message);
+                await context.Response.WriteAsJsonAsync(forbiddenException.Message);
             }
             catch (NotFoundForeignKey notFoundForeignKey)
             {
                 context.Response.StatusCode = 410;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsync(notFoundForeignKey.Message);
+                await context.Response.WriteAsJsonAsync(notFoundForeignKey.Message);
             }
             catch (NotAllowedFileExtension notAllowedFileExtension)
             {
                 context.Response.StatusCode = 415;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsync(notAllowedFileExtension.Message);
+                await context.Response.WriteAsJsonAsync(notAllowedFileExtension.Message);
+            }
+            catch (AlreadyExistsException alreadyExists)
+            {
+                context.Response.StatusCode = 409;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsJsonAsync(new { Message = alreadyExists.Message });
             }
             catch (Exception exception)
             {

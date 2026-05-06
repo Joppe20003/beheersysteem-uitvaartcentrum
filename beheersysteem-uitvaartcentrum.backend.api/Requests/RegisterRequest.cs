@@ -14,7 +14,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Auth
         [EmailAddress(ErrorMessage = "Ongeldig e-mailadres.")]
         public string Email { get; set; } = string.Empty;
         [Required(ErrorMessage = "Wachtwoord is verplicht.")]
-        [MinLength(1, ErrorMessage = "Wachtwoord moet minimaal 16 tekens bevatten.")]
+        [MinLength(16, ErrorMessage = "Wachtwoord moet minimaal 16 tekens bevatten.")]
         public string Password { get; set; } = string.Empty;
     }
 }

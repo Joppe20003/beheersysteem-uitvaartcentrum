@@ -29,16 +29,18 @@ function Header() {
                 <span>Menu</span>
             </div>
 
-            <nav aria-label="Primary" className="d-none d-md-block">
-                <ul className="list-unstyled d-flex mb-0">
-                    <li className="col-auto">
-                        <Link className="header-item text-black text-decoration-none py-2 m-2" to="/">Home</Link>
-                    </li>
-                    <li className="col-auto">
-                        <Link className="header-item text-black text-decoration-none py-2 m-2" to="/dossiers">Dossiers</Link>
-                    </li>
-                </ul>
-            </nav>
+            <div className="col-auto d-none d-md-block">
+                <nav aria-label="Primary">
+                    <ul className="list-unstyled d-flex flex-nowrap align-items-center mb-0">
+                        <li>
+                            <Link className="header-item text-black text-decoration-none py-2 mx-2" to="/">Home</Link>
+                        </li>
+                        <li>
+                            <Link className="header-item text-black text-decoration-none py-2 mx-2" to="/dossiers">Dossiers</Link>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
 
             {isMenuOpen && (
                 <div className="d-md-none" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }} onClick={() => setIsMenuOpen(false)}>

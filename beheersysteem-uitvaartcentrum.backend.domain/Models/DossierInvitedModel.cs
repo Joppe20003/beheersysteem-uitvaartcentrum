@@ -8,8 +8,6 @@ namespace beheersysteem_uitvaartcentrum.backend.domain.Models
 
         public DossierModel Dossier { get; set; } = null!;
 
-        public Guid UserId { get; set; }
-
-        public IdentityUser User { get; set; } = null!;
+        public string UserId { get; set; } = string.Empty;
     }
 }

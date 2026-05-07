@@ -43,14 +43,20 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                     Id = documentModel.Id,
                     Title = documentModel.Title,
                     Extensions = documentModel.Extensions,
-                    DateUploaded = documentModel.DateUploaded,
+                    DateUploaded = documentModel.DateUploaded
                 }).ToList(),
-                InvitedUsers = dossierModel.InvitedUsers.Select(invitedUser => new InvitedUserDTO
-                {
-                    UserId = invitedUser.UserId,
-                    UserName = _userManager.FindByIdAsync(invitedUser.UserId.ToString()).Result?.UserName ?? string.Empty
-                }).ToList()
+                InvitedUsers = new List<InvitedUserDTO>()
             };
+
+            foreach (InvitedUserDTO invited in dossierDTO.InvitedUsers)
+            {
+                IdentityUser userModel = await _userManager.FindByIdAsync(invited.UserId.ToString());
+                dossierDTO.InvitedUsers.Add(new InvitedUserDTO
+                {
+                    UserId = invited.UserId,
+                    UserName = userModel.UserName
+                });
+            }
 
             return dossierDTO;
         }
@@ -61,7 +67,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             List<DossierModel> dossierModels = await _dossierRepository.GetAllDossiersAsync();
 
             List<OverviewDossierDTO> overviewDossierDTO = dossierModels
-                .Where(dossierModel => dossierModel.UserId == Guid.Parse(userId) || dossierModel.InvitedUsers.Any(invitedUser => invitedUser.UserId == Guid.Parse(userId)))
+                .Where(dossierModel => dossierModel.UserId == Guid.Parse(userId) || dossierModel.InvitedUsers.Any(invitedUser => invitedUser.UserId == userId))
                 .Select(dossierModel => new OverviewDossierDTO
                 {
                     Id = dossierModel.Id,
@@ -116,7 +122,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
 
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen rechten om mensen uit te nodigen op dit dossier");
 
-            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId))
+            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId.ToString()))
             {
                 throw new AlreadyExistsException("Gebruiker is al uitgenodigd voor dit dossier.");
             }
@@ -124,7 +130,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             DossierInvitedModel dossierInvitedModel = new DossierInvitedModel
             {
                 DossierId = dossierId,
-                UserId = targetedUserId
+                UserId = targetedUserId.ToString()
             };
 
             await _dossierRepository.InviteUserToDossierAsync(dossierInvitedModel);

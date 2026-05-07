@@ -30,9 +30,11 @@ function Overview() {
             )}
             <div className="d-sm-none col-12" style={{ height: 70 }} />
             <div className="d-sm-none position-fixed bg-white bottom-0 border-top shadow p-2">
-                <button className="btn btn-primary" style={{ width: "stretch" }} onClick={() => navigate("aanmaken")}>
-                    Toevoegen
-                </button>
+                {hasPermission("dossier:create") && (
+                    <button className="btn btn-primary" style={{ width: "stretch" }} onClick={() => navigate("aanmaken")}>
+                        Toevoegen
+                    </button>
+                )}
             </div>
         </section>
     );

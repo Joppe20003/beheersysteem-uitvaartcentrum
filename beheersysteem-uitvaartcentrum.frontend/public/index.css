@@ -7,6 +7,39 @@
     border-radius: 25px;
 }
 
+/* Visible focus for keyboard navigation on links */
+.header-item:focus,
+.header-item:focus-visible {
+    background-color: #e8e8e8;
+    border-radius: 25px;
+    outline: none;
+}
+
+/* Icon buttons (hamburger, close, logout) focus styles */
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 6px;
+}
+
+.icon-btn:focus,
+.icon-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 192, 255, 0.25);
+    border-radius: 6px;
+}
+
+/* Slight box shadow for header links when focused to stand out on light backgrounds */
+.header-item:focus-visible {
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+
 .header-item-name {
     font-size: 1.1rem
 }

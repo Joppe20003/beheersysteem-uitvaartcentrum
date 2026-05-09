@@ -116,6 +116,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         public async Task InviteUserToDossierAsync(ClaimsPrincipal user, Guid dossierId, Guid targetedUserId)
         {
             DossierModel? dossierModel = await _dossierRepository.GetDossierAsync(dossierId);
+            string? userId = user.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
 
             if (dossierModel == null) throw new NotFoundForeignKey("Dossier niet gevonden", "Er is geen dossier gevonden met het opgegeven id");
 
@@ -123,7 +124,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
 
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen rechten om mensen uit te nodigen op dit dossier");
 
-            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId.ToString()) || dossierModel.InvitedUsers.Any(i => i.UserId == user.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value))
+            if (targetedUserId.ToString() == userId || dossierModel.InvitedUsers.Any(invitedUser => invitedUser.UserId == targetedUserId.ToString()))
             {
                 throw new AlreadyExistsException("Gebruiker is al uitgenodigd voor dit dossier.");
             }

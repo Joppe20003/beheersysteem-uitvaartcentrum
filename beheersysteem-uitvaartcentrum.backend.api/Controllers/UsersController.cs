@@ -20,19 +20,15 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            IList<IdentityUser> admins = await _userManager.GetUsersInRoleAsync("Admin");
-            List<string> adminIds = admins.Select(a => a.Id).ToList();
-
-            List<UserOverviewDTO> nonAdmins = _userManager.Users
-                .Where(u => !adminIds.Contains(u.Id))
-                .Select(user => new UserOverviewDTO
+            var users = await _userManager.Users
+                .Select(u => new UserOverviewDTO
                 {
-                    Id = user.Id,
-                    UserName = user.UserName
+                    Id = u.Id,
+                    UserName = u.UserName
                 })
-                .ToList();
+                .ToListAsync();
 
-            return Ok(nonAdmins);
+            return Ok(users);
         }
     }
 }

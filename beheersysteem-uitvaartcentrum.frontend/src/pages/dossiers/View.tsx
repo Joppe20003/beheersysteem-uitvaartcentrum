@@ -110,7 +110,7 @@ function View() {
                 />
                 <article>
                     <header className="d-flex py-2">
-                        <legend className="h3" style={{ textWrap: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}} tabIndex={0}>{dossier?.title}</legend>
+                        <legend className="h3" style={{ textWrap: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} tabIndex={0}>{dossier?.title}</legend>
 
                         <div className="d-none d-sm-block">
                             <div className="d-flex" style={{ height: "stretch" }}>
@@ -140,7 +140,7 @@ function View() {
                     <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Beschrijving niet aanwezig"}</p>
                     <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
                     <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
-                    {user?.role == "Admin" || user?.id == dossier?.userId && (
+                    {user?.id == dossier?.userId && (
                         <>
                             <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang ({dossier?.invitedUsers.length})</p>
                             <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
@@ -165,7 +165,7 @@ function View() {
                                         aria-label={`Toegang voor: ${invitedUser.userName}`}
                                         title={invitedUser.userName}
                                     >
-                                        { nameFormatter(invitedUser.userName) }
+                                        {nameFormatter(invitedUser.userName)}
                                     </div>
                                 ))}
                                 <button

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.User;
+using System.Linq;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
 {
@@ -20,13 +21,16 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userManager.Users
-                .Select(u => new UserOverviewDTO
+            string? userId = User.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
+
+            List<UserOverviewDTO> users = _userManager.Users
+                .Where(user => user.Id != userId)
+                .Select(user => new UserOverviewDTO
                 {
-                    Id = u.Id,
-                    UserName = u.UserName
+                    Id = user.Id,
+                    UserName = user.UserName
                 })
-                .ToListAsync();
+                .ToList();
 
             return Ok(users);
         }

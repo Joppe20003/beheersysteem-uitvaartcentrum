@@ -2,8 +2,7 @@
 {
     public enum Roles
     {
-        Admin = 0,
-        UitvaartOndernemer = 1,
-        Externe = 2
+        UitvaartOndernemer = 0,
+        Externe = 1
     }
 }

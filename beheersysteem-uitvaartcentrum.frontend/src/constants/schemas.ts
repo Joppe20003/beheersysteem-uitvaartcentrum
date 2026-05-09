@@ -9,7 +9,7 @@ export const createUserSchema = z.object({
     username: z.string().min(1, "Gebruikersnaam is verplicht"),
     email: z.string().email("Ongeldig e-mailadres"),
     role: z.number().min(1, "Rol is verplicht"),
-    password: z.string().min(18, "Wachtwoord moet minimaal 18 tekens bevatten")
+    password: z.string().min(16, "Wachtwoord moet minimaal 18 tekens bevatten")
 });
 
 export const loginSchema = z.object({

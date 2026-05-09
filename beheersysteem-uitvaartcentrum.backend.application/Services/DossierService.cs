@@ -48,13 +48,14 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 InvitedUsers = new List<InvitedUserDTO>()
             };
 
-            foreach (InvitedUserDTO invited in dossierDTO.InvitedUsers)
+            // Populate invited users from the dossier model
+            foreach (DossierInvitedModel invited in dossierModel.InvitedUsers)
             {
-                IdentityUser userModel = await _userManager.FindByIdAsync(invited.UserId.ToString());
+                IdentityUser? userModel = await _userManager.FindByIdAsync(invited.UserId);
                 dossierDTO.InvitedUsers.Add(new InvitedUserDTO
                 {
-                    UserId = invited.UserId,
-                    UserName = userModel.UserName
+                    UserId = Guid.Parse(invited.UserId),
+                    UserName = userModel?.UserName ?? string.Empty
                 });
             }
 
@@ -122,7 +123,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
 
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen rechten om mensen uit te nodigen op dit dossier");
 
-            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId.ToString()))
+            if (dossierModel.InvitedUsers.Any(i => i.UserId == targetedUserId.ToString()) || dossierModel.InvitedUsers.Any(i => i.UserId == user.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value))
             {
                 throw new AlreadyExistsException("Gebruiker is al uitgenodigd voor dit dossier.");
             }

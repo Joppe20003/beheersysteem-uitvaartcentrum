@@ -28,6 +28,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         {
             DossierModel? dossierModel = await _dossierRepository.GetDossierAsync(dossierId);
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, dossierModel, "DossierAccess");
+            string currentUserId = _userManager.GetUserId(user)!;
 
             if (dossierModel == null) return null;
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen toegang tot dit dossier");
@@ -36,6 +37,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             {
                 Id = dossierModel.Id,
                 Title = dossierModel.Title,
+                UserId = dossierModel.UserId,
                 Description = dossierModel.Description,
                 DateCreated = dossierModel.DateCreated,
                 Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO
@@ -48,9 +50,22 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
                 InvitedUsers = new List<InvitedUserDTO>()
             };
 
-            // Populate invited users from the dossier model
+            if (dossierModel.UserId.ToString() != currentUserId)
+            {
+                IdentityUser? owner = await _userManager.FindByIdAsync(dossierModel.UserId.ToString());
+
+                dossierDTO.InvitedUsers.Add(new InvitedUserDTO
+                {
+                    UserId = dossierModel.UserId,
+                    UserName = owner.UserName ?? string.Empty
+                });
+            }
+
             foreach (DossierInvitedModel invited in dossierModel.InvitedUsers)
             {
+                if(invited.UserId == dossierModel.UserId.ToString()) continue;
+                if(invited.UserId == currentUserId) continue;
+
                 IdentityUser? userModel = await _userManager.FindByIdAsync(invited.UserId);
                 dossierDTO.InvitedUsers.Add(new InvitedUserDTO
                 {

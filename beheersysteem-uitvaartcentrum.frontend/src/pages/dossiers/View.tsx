@@ -140,54 +140,53 @@ function View() {
                     <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Beschrijving niet aanwezig"}</p>
                     <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
                     <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
-                    {user?.id == dossier?.userId && (
-                        <>
-                            <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang ({dossier?.invitedUsers.length})</p>
-                            <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
-                                {dossier?.invitedUsers.map((invitedUser) => (
-                                    <div
-                                        key={invitedUser.userId}
-                                        className="col-auto d-flex align-items-center justify-content-center shadow-sm"
-                                        style={{
-                                            height: "45px",
-                                            width: "45px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#e3f2fd",
-                                            border: "2px solid rgb(0, 192, 255)",
-                                            color: "rgb(0, 192, 255)",
-                                            fontSize: "0.9rem",
-                                            fontWeight: "bold",
-                                            position: "relative",
-                                            cursor: "pointer"
-                                        }}
-                                        tabIndex={0}
-                                        role="img"
-                                        aria-label={`Toegang voor: ${invitedUser.userName}`}
-                                        title={invitedUser.userName}
-                                    >
-                                        {nameFormatter(invitedUser.userName)}
-                                    </div>
-                                ))}
-                                <button
-                                    className="col-auto btn d-flex align-items-center justify-content-center shadow-sm"
-                                    onClick={handleAddUserToDossierClick}
-                                    style={{
-                                        height: "45px",
-                                        width: "45px",
-                                        borderRadius: "50%",
-                                        border: "2px dashed rgb(0, 192, 255)",
-                                        backgroundColor: "transparent",
-                                        color: "rgb(0, 192, 255)",
-                                        transition: "all 0.2s ease"
-                                    }}
-                                    aria-label="Nieuwe gebruiker uitnodigen voor dit dossier"
-                                    title="Gebruiker toevoegen"
-                                >
-                                    <i className="bi bi-person-plus-fill" style={{ fontSize: "1.2rem" }} />
-                                </button>
+                    <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang: ({dossier?.invitedUsers.length})</p>
+                    <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
+                        {dossier?.invitedUsers.map((invitedUser) => (
+                            <div
+                                key={invitedUser.userId}
+                                className="col-auto d-flex align-items-center justify-content-center shadow-sm"
+                                style={{
+                                    height: "45px",
+                                    width: "45px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#e3f2fd",
+                                    border: "2px solid rgb(0, 192, 255)",
+                                    color: "rgb(0, 192, 255)",
+                                    fontSize: "0.9rem",
+                                    fontWeight: "bold",
+                                    position: "relative",
+                                    cursor: "pointer"
+                                }}
+                                tabIndex={0}
+                                role="img"
+                                aria-label={`Toegang voor: ${invitedUser.userName}`}
+                                title={invitedUser.userName}
+                            >
+                                {nameFormatter(invitedUser.userName)}
                             </div>
-                        </>
-                    )}
+                        ))}
+
+                        { user?.userId == dossier?.userId && (
+                            <button
+                                className="col-auto btn d-flex align-items-center justify-content-center shadow-sm"
+                                onClick={handleAddUserToDossierClick}
+                                style={{
+                                    height: "45px",
+                                    width: "45px",
+                                    borderRadius: "50%",
+                                    border: "2px dashed rgb(0, 192, 255)",
+                                    backgroundColor: "transparent",
+                                    color: "rgb(0, 192, 255)",
+                                    transition: "all 0.2s ease"
+                                }}
+                                aria-label="Nieuwe gebruiker uitnodigen voor dit dossier"
+                                title="Gebruiker toevoegen"
+                            >
+                                <i className="bi bi-person-plus-fill" style={{ fontSize: "1.2rem" }} />
+                            </button>
+                        )}
+                    </div>
                     <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden: (toegestaande extensies: PDF, JPG, JPEG, PNG)</p>
                     <Table data={dossier?.documents || []} columns={columns} noResultsText="Geen gekoppelde bestanden bij dit dossier" />
                 </article>

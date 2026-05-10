@@ -26,14 +26,6 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Data
             }
 
             authContext.SaveChanges();
-
-            if (!userManager.Users.Any())
-            {
-                IdentityUser adminUser = new IdentityUser { UserName = "admin", Email = "admin@gmail.com" };
-
-                userManager.CreateAsync(adminUser, "hetwachtwoordmoetminimaal16tekensbevatten").GetAwaiter().GetResult();
-                userManager.AddToRoleAsync(adminUser, Roles.Admin.ToString()).GetAwaiter().GetResult();
-            }
         }
     }
 }

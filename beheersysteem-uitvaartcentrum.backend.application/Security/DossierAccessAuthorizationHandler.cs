@@ -22,7 +22,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Security
                 return Task.CompletedTask;
             }
 
-            if (userId != null && resource.InvitedUsers.Any(u => u.UserId == Guid.Parse(userId)))
+            if (userId != null && resource.InvitedUsers.Any(u => u.UserId == userId))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

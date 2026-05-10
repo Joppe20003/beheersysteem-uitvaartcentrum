@@ -1,0 +1,55 @@
+name: "CI Checks"
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+      - hotfix/*
+      - release/*
+      - bugfix/*
+  pull_request:
+    branches:
+      - main
+      - feature/*
+      - hotfix/*
+      - release/*
+      - develop
+      - bugfix/*
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x' # Sluit aan op je csproj TargetFramework
+
+      - name: Restore dependencies
+        run: dotnet restore beheersysteem-uitvaartcentrum.slnx
+
+      - name: Build Backend
+        run: dotnet build beheersysteem-uitvaartcentrum.slnx --no-restore --configuration Release
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # LTS versie aangeraden voor Vite
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
+        run: npm run build

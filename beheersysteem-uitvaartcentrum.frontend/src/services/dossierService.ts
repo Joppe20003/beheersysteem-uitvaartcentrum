@@ -15,8 +15,6 @@ class DossierService {
             credentials: "include"
         });
 
-        console.log("POST", endpoint, data, res);
-
         if (!res.ok) {
             const error = await res.json();
 

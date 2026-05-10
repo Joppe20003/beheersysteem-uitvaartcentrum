@@ -24,7 +24,8 @@ const ProtectedComponent: React.FC<ProtectedProps> = ({ children }) => {
 
                 setUser(data);
             } catch (error: unknown) {
-                const status = error.status || error.statusCode;
+                const err = error as { status?: number; statusCode?: number };
+                const status = err.status || err.statusCode;
 
                 if (status === 403) {
                     navigate(-1);

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { useRef, useEffect } from "react";
 import { useForm } from "../../hooks/useForm";
 import { loginSchema, LoginValues } from "../../constants/schemas";

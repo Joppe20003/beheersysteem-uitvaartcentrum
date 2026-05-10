@@ -27,13 +27,13 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x' # Sluit aan op je csproj TargetFramework
+          dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore beheersysteem-uitvaartcentrum.slnx
+        run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
 
       - name: Build Backend
-        run: dotnet build beheersysteem-uitvaartcentrum.slnx --no-restore --configuration Release
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
   build-frontend:
     runs-on: ubuntu-latest
     steps:

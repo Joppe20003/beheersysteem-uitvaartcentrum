@@ -16,7 +16,6 @@ type UserOverview = {
 
 function PeopleSelector({ dossierId, onInviteComplete, onClose }: PeopleSelectorProps) {
     const [users, setUsers] = useState<UserOverview[]>([]);
-    const [query, setQuery] = useState("");
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const { showAlert, clearAlert } = useAlert();
@@ -36,10 +35,8 @@ function PeopleSelector({ dossierId, onInviteComplete, onClose }: PeopleSelector
     }, [showAlert]);
 
     const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q) return users;
-        return users.filter(u => (u.userName || "").toLowerCase().includes(q));
-    }, [users, query]);
+        return users.filter(u => (u.userName || "").toLowerCase());
+    }, [users]);
 
     const handleInvite = async () => {
         if (!dossierId || !selectedUserId) return;

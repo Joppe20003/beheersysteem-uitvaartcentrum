@@ -117,15 +117,15 @@ using (var scope = app.Services.CreateScope())
     appContext.Database.Migrate();
     authContext.Database.Migrate();
 
+    DbInitializer.Seed(authContext);
+
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        DbInitializer.Fixture(appContext);
+        DbInitializer.Fixture(userManager, appContext);
     }
-
-    DbInitializer.Seed(userManager, authContext);
 }
 
 app.UseMiddleware<ExceptionMiddleware>();

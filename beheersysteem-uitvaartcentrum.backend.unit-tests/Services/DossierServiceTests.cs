@@ -6,6 +6,7 @@ using beheersysteem_uitvaartcentrum.backend.domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using NUnit.Framework;
 using System.Security.Claims;
 
 namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
@@ -29,10 +30,14 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _dossierService = new DossierService(_userManagerMock.Object, _dossierRepositoryMock.Object, _authorizationServiceMock.Object);
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // CreateDossierAsync
+        // ──────────────────────────────────────────────────────────────────────
+
         [Test]
         public async Task CreateDossierAsync_HappyPath_ReturnsDossierDTO()
         {
-            // Arange
+            // Arrange
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
             var dto = new CreateDossierDTO
             {
@@ -52,9 +57,10 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dto, "DossierCreate")).ReturnsAsync(AuthorizationResult.Success());
             _dossierRepositoryMock.Setup(repo => repo.CreateDossierAsync(It.IsAny<DossierModel>())).ReturnsAsync(createdDossier);
 
-            // Assert and act
+            // Act
             var result = await _dossierService.CreateDossierAsync(user, dto);
 
+            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Title, Is.EqualTo(dto.Title));
             Assert.That(result.Description, Is.EqualTo(dto.Description));
@@ -81,7 +87,7 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             // Set up
             _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dto, "DossierCreate")).ReturnsAsync(AuthorizationResult.Failed());
 
-            // Assert and act
+            // Act and assert
             var exception = Assert.ThrowsAsync<ForbiddenException>(async () => await _dossierService.CreateDossierAsync(user, dto));
 
             Assert.That(exception.Message, Is.EqualTo("De gebruiker heeft geen rechten om dossier aan te maken"));
@@ -89,27 +95,75 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _dossierRepositoryMock.Verify(repo => repo.CreateDossierAsync(It.IsAny<DossierModel>()), Times.Never);
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // GetAllDossiersAsync
+        // ──────────────────────────────────────────────────────────────────────
+
         [Test]
-        public async Task OverviewDossierAsync_HappyPath_ReturnsListOfDossiers()
+        public async Task OverviewDossierAsync_HappyPath_ReturnsOnlyDossiersWhereUserIsOwner()
         {
             // Arrange
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
+            var userId = Guid.NewGuid().ToString();
+            var otherUserId = Guid.NewGuid().ToString();
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", userId) }, "mock"));
+
             var dossiers = new List<DossierModel>
             {
-                new DossierModel { Id = Guid.NewGuid(), Title = "Dossier 1", UserId = Guid.Parse(user.Claims.First(c => c.Type == "userId").Value) },
-                new DossierModel { Id = Guid.NewGuid(), Title = "Dossier 2", UserId = Guid.Parse(user.Claims.First(c => c.Type == "userId").Value) }
+                new DossierModel { Id = Guid.NewGuid(), Title = "Eigen dossier", UserId = Guid.Parse(userId), InvitedUsers = new List<DossierInvitedModel>() },
+                new DossierModel { Id = Guid.NewGuid(), Title = "Ander dossier", UserId = Guid.Parse(otherUserId), InvitedUsers = new List<DossierInvitedModel>() }
             };
-            
+
             // Set up
             _dossierRepositoryMock.Setup(repo => repo.GetAllDossiersAsync()).ReturnsAsync(dossiers);
 
-            // Assert and act
+            // Act
             var result = await _dossierService.GetAllDossiersAsync(user);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(dossiers.Count));
-            Assert.That(result.All(d => dossiers.Any(dm => dm.Id == d.Id)), Is.True);
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Title, Is.EqualTo("Eigen dossier"));
         }
+
+        [Test]
+        public async Task OverviewDossierAsync_HappyPath_ReturnsOnlyDossiersWhereUserIsInvited()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            var otherUserId = Guid.NewGuid().ToString();
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", userId) }, "mock"));
+
+            var dossiers = new List<DossierModel>
+            {
+                new DossierModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Uitgenodigd dossier",
+                    UserId = Guid.Parse(otherUserId),
+                    InvitedUsers = new List<DossierInvitedModel> { new DossierInvitedModel { UserId = userId } }
+                },
+                new DossierModel
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Niet uitgenodigd dossier",
+                    UserId = Guid.Parse(otherUserId),
+                    InvitedUsers = new List<DossierInvitedModel>()
+                }
+            };
+
+            // Set up
+            _dossierRepositoryMock.Setup(repo => repo.GetAllDossiersAsync()).ReturnsAsync(dossiers);
+
+            // Act
+            var result = await _dossierService.GetAllDossiersAsync(user);
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.First().Title, Is.EqualTo("Uitgenodigd dossier"));
+        }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // GetDossierAsync
+        // ──────────────────────────────────────────────────────────────────────
 
         [Test]
         public async Task ViewDossierAsync_HappyPath_ReturnsViewDossierDTO()
@@ -131,9 +185,10 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _dossierRepositoryMock.Setup(repo => repo.GetDossierAsync(dossierModel.Id)).ReturnsAsync(dossierModel);
             _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dossierModel, "DossierAccess")).ReturnsAsync(AuthorizationResult.Success());
 
-            // Assert and act
+            // Act
             var result = await _dossierService.GetDossierAsync(user, dossierModel.Id);
 
+            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Id, Is.EqualTo(dossierModel.Id));
             Assert.That(result.Title, Is.EqualTo(dossierModel.Title));
@@ -143,7 +198,25 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
         }
 
         [Test]
-        public async Task ViewDossierAsync_AuthorizationDossierAccessByUserIdFails_ThrowsForbiddenException()
+        public async Task ViewDossierAsync_DossierNotFound_ReturnsNull()
+        {
+            // Arrange
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
+            var dossierId = Guid.NewGuid();
+
+            // Set up
+            _dossierRepositoryMock.Setup(repo => repo.GetDossierAsync(dossierId)).ReturnsAsync((DossierModel)null);
+            _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, (DossierModel)null, "DossierAccess")).ReturnsAsync(AuthorizationResult.Failed());
+
+            // Act
+            var result = await _dossierService.GetDossierAsync(user, dossierId);
+
+            // Assert
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public async Task ViewDossierAsync_AuthorizationFails_ThrowsForbiddenException()
         {
             // Arrange
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
@@ -162,36 +235,76 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _dossierRepositoryMock.Setup(repo => repo.GetDossierAsync(dossierModel.Id)).ReturnsAsync(dossierModel);
             _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dossierModel, "DossierAccess")).ReturnsAsync(AuthorizationResult.Failed());
 
-            // Assert and act
+            // Act and assert
             var exception = Assert.ThrowsAsync<ForbiddenException>(async () => await _dossierService.GetDossierAsync(user, dossierModel.Id));
 
             Assert.That(exception.Message, Is.EqualTo("De gebruiker heeft geen toegang tot dit dossier"));
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // InviteUserToDossierAsync
+        // ──────────────────────────────────────────────────────────────────────
+
         [Test]
-        public async Task ViewDossierAsync_AuthorizationDossierAccessByInvitedUserIdFails_ThrowsForbiddenException()
+        public async Task InviteUserToDossier_HappyPath_InvitesUserToDossier()
         {
             // Arrange
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
+            var userId = Guid.NewGuid().ToString();
+            var targetedUserId = Guid.NewGuid();
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", userId) }, "mock"));
+
             var dossierModel = new DossierModel
             {
                 Id = Guid.NewGuid(),
                 Title = "Test Dossier",
-                Description = "Test omschrijving",
-                UserId = Guid.NewGuid(),
-                DateCreated = DateTime.UtcNow,
-                Documents = new List<DocumentModel>(),
+                UserId = Guid.Parse(userId),
                 InvitedUsers = new List<DossierInvitedModel>()
             };
 
             // Set up
             _dossierRepositoryMock.Setup(repo => repo.GetDossierAsync(dossierModel.Id)).ReturnsAsync(dossierModel);
-            _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dossierModel, "DossierAccess")).ReturnsAsync(AuthorizationResult.Failed());
+            _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dossierModel, "DossierInvite")).ReturnsAsync(AuthorizationResult.Success());
+            _dossierRepositoryMock.Setup(repo => repo.InviteUserToDossierAsync(It.IsAny<DossierInvitedModel>())).Returns(Task.CompletedTask);
 
-            // Assert and act
-            var exception = Assert.ThrowsAsync<ForbiddenException>(async () => await _dossierService.GetDossierAsync(user, dossierModel.Id));
+            // Act
+            await _dossierService.InviteUserToDossierAsync(user, dossierModel.Id, targetedUserId);
 
-            Assert.That(exception.Message, Is.EqualTo("De gebruiker heeft geen toegang tot dit dossier"));
+            // Assert
+            _dossierRepositoryMock.Verify(repo => repo.InviteUserToDossierAsync(It.Is<DossierInvitedModel>(d =>
+                d.DossierId == dossierModel.Id &&
+                d.UserId == targetedUserId.ToString()
+            )), Times.Once);
+        }
+
+        [Test]
+        public async Task InviteUserToDossier_UserAlreadyInvited_ThrowsAlreadyExistsException()
+        {
+            // Arrange
+            var userId = Guid.NewGuid().ToString();
+            var targetedUserId = Guid.NewGuid();
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", userId) }, "mock"));
+
+            var dossierModel = new DossierModel
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test Dossier",
+                UserId = Guid.Parse(userId),
+                InvitedUsers = new List<DossierInvitedModel>
+                {
+                    new DossierInvitedModel { UserId = targetedUserId.ToString() }
+                }
+            };
+
+            // Set up
+            _dossierRepositoryMock.Setup(repo => repo.GetDossierAsync(dossierModel.Id)).ReturnsAsync(dossierModel);
+            _authorizationServiceMock.Setup(auth => auth.AuthorizeAsync(user, dossierModel, "DossierInvite")).ReturnsAsync(AuthorizationResult.Success());
+
+            // Act and assert
+            var exception = Assert.ThrowsAsync<AlreadyExistsException>(async () => await _dossierService.InviteUserToDossierAsync(user, dossierModel.Id, targetedUserId));
+
+            Assert.That(exception.Message, Is.EqualTo("Gebruiker is al uitgenodigd voor dit dossier."));
+
+            _dossierRepositoryMock.Verify(repo => repo.InviteUserToDossierAsync(It.IsAny<DossierInvitedModel>()), Times.Never);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         {
             DossierModel? dossierModel = await _dossierRepository.GetDossierAsync(dossierId);
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, dossierModel, "DossierAccess");
-            string currentUserId = _userManager.GetUserId(user)!;
+            string? currentUserId = user.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
 
             if (dossierModel == null) return null;
             if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen toegang tot dit dossier");
@@ -98,7 +98,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
         {
             AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(user, createDossierDTO, "DossierCreate");
 
-            if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen toegang tot dit dossier");
+            if (!authorizationResult.Succeeded) throw new ForbiddenException("Gebruiker heeft geen toegang", "De gebruiker heeft geen rechten om dossier aan te maken");
 
             string? userId = user.Claims.FirstOrDefault(claim => claim.Type == "userId")?.Value;
             DossierModel dossierModel = new DossierModel
@@ -114,6 +114,7 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Services
             {
                 Id = createdDossierModel.Id,
                 Title = createdDossierModel.Title,
+                UserId = createdDossierModel.UserId,
                 Description = createdDossierModel.Description,
                 DateCreated = createdDossierModel.DateCreated,
                 Documents = dossierModel.Documents.Select(documentModel => new ViewDocumentDTO

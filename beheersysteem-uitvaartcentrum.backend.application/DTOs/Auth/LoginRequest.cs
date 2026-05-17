@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace beheersysteem_uitvaartcentrum.backend.api.Requests
+namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Auth
 {
     public class LoginRequest
     {

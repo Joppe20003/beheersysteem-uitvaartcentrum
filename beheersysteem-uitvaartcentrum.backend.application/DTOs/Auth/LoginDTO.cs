@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace beheersysteem_uitvaartcentrum.backend.api.Requests
+namespace beheersysteem_uitvaartcentrum.backend.application.DTOs.Auth
 {
-    public class LoginRequest
+    public class LoginDTO
     {
         [Required(ErrorMessage = "Email is verplicht.")]
         public string Email { get; set; } = string.Empty;

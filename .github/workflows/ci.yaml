@@ -60,8 +60,8 @@ jobs:
       - name: Build UI tests
         run: dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
 
-      - name: Install Playwright browsers
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release --list-tests
+      - name: Install Playwright
+        run: pwsh ./beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install
 
       - name: Start backend
         run: dotnet run --project beheersysteem-uitvaartcentrum.backend.api > backend.log 2>&1 &

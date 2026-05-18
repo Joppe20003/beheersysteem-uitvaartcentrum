@@ -19,7 +19,7 @@ on:
       - bugfix/*
 
 jobs:
-  build-and-test-backend:
+  backend-and-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +34,10 @@ jobs:
 
       - name: Build Backend
         run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
+
+      - name: Unit Tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
+      
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -53,8 +57,3 @@ jobs:
       - name: Build Frontend
         working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm run build
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Unit tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests

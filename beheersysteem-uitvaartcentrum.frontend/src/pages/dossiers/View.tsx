@@ -93,7 +93,7 @@ function View() {
     ];
 
     // Playwright wacht in CI op het verdwijnen van deze sectie
-    if (loading) {
+    if (loading && !dossier) {
         return (
             <section className="row">
                 <legend className="h1" tabIndex={0}>Dossiers detail</legend>

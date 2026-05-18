@@ -8,6 +8,8 @@ function Overview() {
     const { dossiers, error, loading } = useDossiers();
     const { hasPermission } = useAuth();
 
+    const showLoadingScreen = loading && (!dossiers || dossiers.length === 0);
+
     return (
         <section className="row">
             <header className="col-12 pt-2 d-flex">
@@ -23,7 +25,7 @@ function Overview() {
                 )}
             </header>
 
-            {loading ? (
+            {showLoadingScreen ? (
                 <p className="col-12 text-muted mt-2" aria-busy="true">Laden...</p>
             ) : error ? (
                 <p className="col-12 text-muted mt-2">{error}</p>

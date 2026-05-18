@@ -29,7 +29,7 @@ namespace beheersysteem_uitvaartcentrum.backend.ui_tests.UseCases
 
             await Expect(dossierTitle).ToHaveTextAsync("Dossier Zonder Extra's");
             await Expect(dossierDescription).ToHaveTextAsync("Eigendom van Jan, geen genodigden.");
-            await Expect(dossierCreatedDate).ToHaveTextAsync("21:16, 16-5-2026");
+            await Expect(dossierCreatedDate).ToHaveTextAsync("17:40, 18-5-2026");
         }
     }
 }

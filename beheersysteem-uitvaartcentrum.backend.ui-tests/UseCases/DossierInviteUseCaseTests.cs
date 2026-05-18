@@ -32,13 +32,13 @@ namespace beheersysteem_uitvaartcentrum.backend.ui_tests.UseCases
             var dialog = Page.GetByRole(AriaRole.Dialog);
             await Expect(dialog).ToBeVisibleAsync();
 
-            var firstUser = Page.Locator("[data-testid^='user-radio-']").First;
+            var firstUser = Page.Locator("[data-testid^='user-radio-']").Last;
             await Expect(firstUser).ToBeVisibleAsync();
             await firstUser.CheckAsync();
 
             await Page.GetByLabel("confirm-user-invite-to-dossier").ClickAsync();
 
-            await Expect(Page.GetByLabel("Nieuwe gebruiker uitnodigen voor dit dossier")).Not.ToBeVisibleAsync();
+            await Expect(Page.GetByLabel("confirm-user-invite-to-dossier")).Not.ToBeVisibleAsync();
 
             var invitedUsersAfter = Page.Locator("[aria-label^='Toegang voor:']");
 

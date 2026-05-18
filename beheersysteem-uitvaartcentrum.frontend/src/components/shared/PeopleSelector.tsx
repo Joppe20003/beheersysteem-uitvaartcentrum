@@ -76,6 +76,7 @@ function PeopleSelector({ dossierId, onInviteComplete, onClose }: PeopleSelector
                             <div>{user.userName}</div>
                             <div>
                                 <input
+                                    data-testid={`user-radio-${user.id}`}
                                     type="radio"
                                     name="selectedUser"
                                     checked={selectedUserId === user.id}
@@ -89,7 +90,7 @@ function PeopleSelector({ dossierId, onInviteComplete, onClose }: PeopleSelector
 
             <div className="d-flex gap-2 mt-3">
                 <button className="btn btn-secondary" onClick={() => onClose ? onClose() : undefined}>Sluiten</button>
-                <button className="btn btn-primary ms-auto" onClick={handleInvite} disabled={!selectedUserId || !dossierId || loading}>
+                <button className="btn btn-primary ms-auto" onClick={handleInvite} aria-label="confirm-user-invite-to-dossier" disabled={!selectedUserId || !dossierId || loading}>
                     {loading ? 'Bezig...' : 'Uitnodigen'}
                 </button>
             </div>

@@ -32,7 +32,7 @@ namespace beheersysteem_uitvaartcentrum.backend.ui_tests.UseCases
             var dialog = Page.GetByRole(AriaRole.Dialog);
             await Expect(dialog).ToBeVisibleAsync();
 
-            var firstUser = Page.Locator("[data-testid^='user-radio-']").Last;
+            var firstUser = Page.Locator("[data-testid^='user-radio-']").First;
             await Expect(firstUser).ToBeVisibleAsync();
             await firstUser.CheckAsync();
 

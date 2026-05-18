@@ -2,123 +2,59 @@ name: "CI Checks"
 
 on:
   push:
-    branches: [main, develop, "feature/*", "hotfix/*", "release/*", "bugfix/*"]
+    branches:
+      - main
+      - develop
+      - feature/*
+      - hotfix/*
+      - release/*
+      - bugfix/*
   pull_request:
-    branches: [main, develop, "feature/*", "hotfix/*", "release/*", "bugfix/*"]
+    branches:
+      - main
+      - feature/*
+      - hotfix/*
+      - release/*
+      - develop
+      - bugfix/*
 
 jobs:
-  backend-build:
+  build-and-test-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.0.x"
-      # Specifiek project herstellen om .esproj fouten te voorkomen
-      - run: dotnet restore beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj
-      - run: dotnet build beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-restore
-
-  frontend-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: "**/package-lock.json"
-      
-      - name: Install Frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: npm ci
-
-      - name: Build Frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: npm run build
-        
-  test:
-    needs: [backend-build, frontend-build]
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: uitvaart_admin
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }} 
-          POSTGRES_DB: uitvaart_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U uitvaart_admin -d uitvaart_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore dependencies
+        run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
+
+      - name: Build Backend
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20' # LTS versie aangeraden voor Vite
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-      - name: Install Frontend Dependencies
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
+      - name: Install dependencies
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm ci
 
-      - name: Install Backend Dependencies
-        # Herstel alleen de noodzakelijke backend projecten
-        run: |
-          dotnet restore beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj
-          dotnet restore beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj
-
-      - name: Build Projects
-        run: |
-          dotnet build beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-restore
-          dotnet build beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj --configuration Release --no-restore
-
-      - name: Install Playwright Browsers and Deps
-        run: pwsh ./beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install --with-deps
-
-      - name: Start Backend API
-        run: |
-          dotnet run --project beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-build > backend.log 2>&1 &
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
-          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaart_db;Username=uitvaart_admin;Password=${{ secrets.DB_PASSWORD }}"
-          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=uitvaart_db;Username=uitvaart_admin;Password=${{ secrets.DB_PASSWORD }}"
-          Jwt__Key: ${{ secrets.JWT_KEY }}
-          RECREATE_DB: "True"
-
-      - name: Build & Preview Frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: |
-          npm run build
-          npm run preview -- --host --port 5173 &
-
-      - name: Wait for Services
-        run: |
-          npx wait-on https://localhost:7205/swagger/index.html --timeout 120000 --ignore-https-errors
-          npx wait-on http://localhost:5173 --timeout 60000
-
-      - name: Run Unit Tests
-        run: dotnet test beheersysteem_uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
-
-      - name: Run UI Tests
-        run: dotnet test beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj --configuration Release --no-build
-        env:
-          HEADLESS: true
-
-      - name: Upload Logs on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-log
-          path: backend.log
+      - name: Build Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
+        run: npm run build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unit tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests

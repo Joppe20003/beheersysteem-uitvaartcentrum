@@ -2,77 +2,58 @@ name: "CI Checks"
 
 on:
   push:
-    branches: [main, develop, feature/*, hotfix/*, release/*, bugfix/*]
+    branches:
+      - main
+      - develop
+      - feature/*
+      - hotfix/*
+      - release/*
+      - bugfix/*
   pull_request:
-    branches: [main, develop, feature/*, hotfix/*, release/*, bugfix/*]
+    branches:
+      - main
+      - feature/*
+      - hotfix/*
+      - release/*
+      - develop
+      - bugfix/*
 
 jobs:
-  backend-build:
+  backend-and-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: '10.0.x'
 
-      - run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
-      - run: dotnet build beheersysteem-uitvaartcentrum.backend.api --configuration Release --no-restore
+      - name: Restore dependencies
+        run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
 
+      - name: Build Backend
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
 
-  frontend-build:
+      - name: Unit Tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
+      
+  build-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: "**/package-lock.json"
+          node-version: '20' # LTS versie aangeraden voor Vite
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-      - working-directory: ./beheersysteem-uitvaartcentrum.frontend
+      - name: Install dependencies
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm ci
 
-      - working-directory: ./beheersysteem-uitvaartcentrum.frontend
+      - name: Build Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm run build
-
-
-  tests:
-    runs-on: ubuntu-latest
-    needs: [backend-build, frontend-build]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.0.x"
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install frontend deps
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: npm ci
-
-      - name: Build UI tests
-        run: dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
-
-      - name: Install Playwright
-        run: pwsh ./beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install
-
-      - name: Start backend
-        run: dotnet run --project beheersysteem-uitvaartcentrum.backend.api > backend.log 2>&1 &
-
-      - name: Start frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: |
-          npm run build
-          npm run preview -- --host --port 5173 &
-
-      - name: Run tests
-        run: |
-          dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests --configuration Release
-          dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release

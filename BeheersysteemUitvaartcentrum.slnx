@@ -3,6 +3,7 @@
   <Project Path="beheersysteem-uitvaartcentrum.backend.application/beheersysteem-uitvaartcentrum.backend.application.csproj" Id="6b4b59e4-f7bf-41b3-96e2-b806e6a0cf66" />
   <Project Path="beheersysteem-uitvaartcentrum.backend.domain/beheersysteem-uitvaartcentrum.backend.domain.csproj" Id="10ff0867-cb22-40a4-a23e-efd5527feb57" />
   <Project Path="beheersysteem-uitvaartcentrum.backend.infrastructure/beheersysteem-uitvaartcentrum.backend.infrastructure.csproj" Id="129b143e-a2c8-4ce5-a648-d44fe4afc860" />
+  <Project Path="beheersysteem-uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj" Id="5a63afdd-9e53-4407-b2fb-03c175ec9e26" />
   <Project Path="beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj" Id="92625d39-e9d1-426b-9296-1d3e107128df" />
   <Project Path="beheersysteem-uitvaartcentrum.frontend/beheersysteem-uitvaartcentrum.frontend.esproj">
     <Build />

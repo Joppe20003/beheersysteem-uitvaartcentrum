@@ -14,8 +14,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-      - run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
-      - run: dotnet build beheersysteem-uitvaartcentrum.backend.api --configuration Release --no-restore
+      # Specifiek project herstellen om .esproj fouten te voorkomen
+      - run: dotnet restore beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj
+      - run: dotnet build beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-restore
 
   frontend-build:
     runs-on: ubuntu-latest
@@ -36,7 +37,7 @@ jobs:
         run: npm run build
         
   test:
-    needs: [backend-build, frontend-build] # Start pas als builds klaar zijn
+    needs: [backend-build, frontend-build]
     runs-on: ubuntu-latest
 
     services:
@@ -73,19 +74,22 @@ jobs:
         run: npm ci
 
       - name: Install Backend Dependencies
-        run: dotnet restore
+        # Herstel alleen de noodzakelijke backend projecten
+        run: |
+          dotnet restore beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj
+          dotnet restore beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj
 
       - name: Build Projects
         run: |
-          dotnet build beheersysteem-uitvaartcentrum.backend.api --configuration Release
-          dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
+          dotnet build beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-restore
+          dotnet build beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj --configuration Release --no-restore
 
       - name: Install Playwright Browsers and Deps
         run: pwsh ./beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install --with-deps
 
       - name: Start Backend API
         run: |
-          dotnet run --project beheersysteem-uitvaartcentrum.backend.api --configuration Release --no-build > backend.log 2>&1 &
+          dotnet run --project beheersysteem_uitvaartcentrum.backend.api/beheersysteem-uitvaartcentrum.backend.api.csproj --configuration Release --no-build > backend.log 2>&1 &
         env:
           ASPNETCORE_ENVIRONMENT: Development
           ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaart_db;Username=uitvaart_admin;Password=${{ secrets.DB_PASSWORD }}"
@@ -105,10 +109,10 @@ jobs:
           npx wait-on http://localhost:5173 --timeout 60000
 
       - name: Run Unit Tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests --configuration Release
+        run: dotnet test beheersysteem_uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
 
       - name: Run UI Tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release --no-build
+        run: dotnet test beheersysteem_uitvaartcentrum.backend.ui-tests/beheersysteem-uitvaartcentrum.backend.ui-tests.csproj --configuration Release --no-build
         env:
           HEADLESS: true
 

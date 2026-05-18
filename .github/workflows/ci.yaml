@@ -2,20 +2,18 @@ name: "CI Checks"
 
 on:
   push:
-    branches: [main, develop, feature/*, hotfix/*, release/*, bugfix/*]
+    branches: [main, develop, "feature/*", "hotfix/*", "release/*", "bugfix/*"]
   pull_request:
-    branches: [main, develop, feature/*, hotfix/*, release/*, bugfix/*]
+    branches: [main, develop, "feature/*", "hotfix/*", "release/*", "bugfix/*"]
 
 jobs:
   backend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-
       - run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
       - run: dotnet build beheersysteem-uitvaartcentrum.backend.api --configuration Release --no-restore
 
@@ -23,20 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: "**/package-lock.json"
-
-      - working-directory: ./beheersysteem-uitvaartcentrum.frontend
+      
+      - name: Install Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: npm ci
 
-      - working-directory: ./beheersysteem-uitvaartcentrum.frontend
+      - name: Build Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: npm run build
         
   test:
+    needs: [backend-build, frontend-build] # Start pas als builds klaar zijn
     runs-on: ubuntu-latest
 
     services:
@@ -44,14 +44,12 @@ jobs:
         image: postgres:latest
         env:
           POSTGRES_USER: uitvaart_admin
-          # Zorg dat dit exact overeenkomt met de naam in je GitHub Secrets!
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }} 
           POSTGRES_DB: uitvaart_db
         ports:
           - 5432:5432
-        # SOEPELERE HEALTH CHECK:
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U uitvaart_admin -d uitvaart_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -70,21 +68,21 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          dotnet restore
+      - name: Install Frontend Dependencies
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend
+        run: npm ci
+
+      - name: Install Backend Dependencies
+        run: dotnet restore
 
       - name: Build Projects
         run: |
           dotnet build beheersysteem-uitvaartcentrum.backend.api --configuration Release
           dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
 
-      # CRUCIAAL: Installeer browsers EN de benodigde Linux libraries (libgtk, libvpx etc.)
       - name: Install Playwright Browsers and Deps
         run: pwsh ./beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install --with-deps
 
-      # Start API (gebruik secrets voor de connection string)
       - name: Start Backend API
         run: |
           dotnet run --project beheersysteem-uitvaartcentrum.backend.api --configuration Release --no-build > backend.log 2>&1 &
@@ -95,13 +93,12 @@ jobs:
           Jwt__Key: ${{ secrets.JWT_KEY }}
           RECREATE_DB: "True"
 
-      # Start Frontend (Preview is stabieler voor tests dan Dev)
       - name: Build & Preview Frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: |
           npm run build
           npm run preview -- --host --port 5173 &
 
-      # Wacht tot de diensten echt reageren (voorkomt TargetClosedException)
       - name: Wait for Services
         run: |
           npx wait-on https://localhost:7205/swagger/index.html --timeout 120000 --ignore-https-errors
@@ -114,3 +111,10 @@ jobs:
         run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release --no-build
         env:
           HEADLESS: true
+
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: backend.log

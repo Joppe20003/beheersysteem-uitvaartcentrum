@@ -93,14 +93,6 @@ jobs:
           nohup npm run dev -- --host --port 5173 > frontend.log 2>&1 &
           echo "Frontend started"
 
-      - name: Wait for services
-        run: |
-          echo "Waiting for backend..."
-          npx wait-on http://localhost:5000 --timeout 50000
-
-          echo "Waiting for frontend..."
-          npx wait-on https://localhost:5173 --timeout 50000
-
       - name: Install Playwright browsers
         working-directory: ./beheersysteem-uitvaartcentrum.backend.ui-tests
         run: npx playwright install

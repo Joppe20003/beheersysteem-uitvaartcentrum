@@ -34,9 +34,6 @@ jobs:
 
       - name: Build Backend
         run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
-
-      - name: Test Backend
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -56,3 +53,11 @@ jobs:
       - name: Build Frontend
         working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm run build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unit tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests
+        
+      - name: UI tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests

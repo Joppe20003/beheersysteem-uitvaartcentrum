@@ -38,7 +38,7 @@ namespace beheersysteem_uitvaartcentrum.backend.ui_tests.UseCases
 
             await Page.GetByLabel("confirm-user-invite-to-dossier").ClickAsync();
 
-            await Expect(dialog).ToBeHiddenAsync();
+            await Expect(Page.GetByLabel("Nieuwe gebruiker uitnodigen voor dit dossier")).Not.ToBeVisibleAsync();
 
             var invitedUsersAfter = Page.Locator("[aria-label^='Toegang voor:']");
 

@@ -108,7 +108,7 @@ function View() {
                     ref={fileInputRef}
                     type="file"
                     className="d-none"
-                    accept={ACCEPTED_FILE_EXTENSIONS}
+                    accept={ACCEPTED_FILE_EXTENSIONS.join(",")}
                     onChange={handleFileChange}
                 />
                 <article>

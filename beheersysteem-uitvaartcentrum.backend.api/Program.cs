@@ -7,6 +7,7 @@ using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,18 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Allow large file uploads (increase multipart body and request size limits)
+// Set to 500 MB here; adjust as needed.
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1024L * 1024L * 512L; // 500 MB
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 1024L * 1024L * 512L; // 500 MB
+});
 
 // Threat #25/#32 - XSS mitigatie: globale sanitatie filter voor alle inkomende requests
 builder.Services.AddScoped<SanitizeInputFilter>();

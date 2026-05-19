@@ -2,6 +2,7 @@
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.Document;
 using beheersysteem_uitvaartcentrum.backend.application.DTOs.DossierFile;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
+using beheersysteem_uitvaartcentrum.backend.domain.Constanten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,14 +55,24 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers
                 return BadRequest(ModelState);
             }
 
+            // quick server-side validations for file size and extension
+            string extension = Path.GetExtension(uploadDocumentRequest.File.FileName).ToLower();
+            if (!Constanten.AllowedFileExtensions.Contains(extension))
+            {
+                return BadRequest(new { message = "Bestandstype niet toegestaan" });
+            }
+
+            if (uploadDocumentRequest.File.Length > Constanten.MaxFileSizeInBytes)
+            {
+                return BadRequest(new { message = $"Bestand is te groot. Maximaal toegestaan: {Constanten.MaxFileSizeInBytes} bytes" });
+            }
+
             UploadDocumentDTO uploadDocumentDTO = new UploadDocumentDTO
             {
                 DossierId = uploadDocumentRequest.DossierId!.Value,
                 FileName = uploadDocumentRequest.File.FileName,
                 Content = uploadDocumentRequest.File.OpenReadStream()
             };
-
-            string userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
 
             ViewDocumentDTO viewDocumentDTO = await _documentService.UploadDocumentAsync(User, uploadDocumentDTO);
 

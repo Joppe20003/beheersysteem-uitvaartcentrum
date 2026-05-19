@@ -14,6 +14,21 @@ public class FileStorageProvider : IFileStorageProvider
 
     public async Task UploadDocumentAsync(Guid dossierId, string fileName, Stream content, List<string> allowedExtensions)
     {
+        string extension = Path.GetExtension(fileName).ToLower();
+        if (!Constanten.AllowedFileExtensions.Contains(extension))
+        {
+            throw new NotAllowedFileExtension("Bestand type niet toegestaan", $"bestand type met het type {extension} is niet toegestaan");
+        }
+        
+        if (content.CanSeek)
+        {
+            if (content.Length > Constanten.MaxFileSizeInBytes)
+            {
+                throw new Exception($"Bestand is te groot. Maximaal toegestaan: {Constanten.MaxFileSizeInBytes} bytes");
+            }
+            content.Position = 0;
+        }
+
         string storagePath = GetStoragePath(dossierId, fileName);
 
         Directory.CreateDirectory(Path.GetDirectoryName(storagePath)!);

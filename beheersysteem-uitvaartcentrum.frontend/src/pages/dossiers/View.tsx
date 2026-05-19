@@ -10,7 +10,7 @@ import useUploadDocument from "../../hooks/useUploadDocument";
 
 import Table, { ColumnDef } from "../../components/shared/Table";
 
-import { ACCEPTED_FILE_EXSTENSIONS } from "../../constants/files"
+import { ACCEPTED_FILE_EXTENSIONS }  from "../../constants/files"
 
 import { useAuth } from "../../hooks/useAuth";
 
@@ -58,7 +58,7 @@ function View() {
 
     const handleInviteComplete = async () => {
         setIsInviteDialogOpen(false);
-        // CRUCIAAL VOOR CI: Wacht tot de nieuwe genodigden daadwerkelijk zijn opgehaald
+
         await refetch();
     }
 
@@ -92,7 +92,6 @@ function View() {
         },
     ];
 
-    // Playwright wacht in CI op het verdwijnen van deze sectie
     if (loading && !dossier) {
         return (
             <section className="row">
@@ -109,7 +108,7 @@ function View() {
                     ref={fileInputRef}
                     type="file"
                     className="d-none"
-                    accept={ACCEPTED_FILE_EXSTENSIONS}
+                    accept={ACCEPTED_FILE_EXTENSIONS}
                     onChange={handleFileChange}
                 />
                 <article>

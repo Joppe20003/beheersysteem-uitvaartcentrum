@@ -161,6 +161,22 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             Assert.That(result.First().Title, Is.EqualTo("Uitgenodigd dossier"));
         }
 
+        [Test]
+        public async Task OverviewDossierAsync_HappyPath_ReturnsEmptyListWhenNoDossiers()
+        {
+            // Arrange
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim("userId", Guid.NewGuid().ToString()) }, "mock"));
+
+            // Set up
+            _dossierRepositoryMock.Setup(repo => repo.GetAllDossiersAsync()).ReturnsAsync(new List<DossierModel>());
+
+            // Act
+            var result = await _dossierService.GetAllDossiersAsync(user);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+
         // ──────────────────────────────────────────────────────────────────────
         // GetDossierAsync
         // ──────────────────────────────────────────────────────────────────────

@@ -27,6 +27,10 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
             _authService = new AuthService(_userManagerMock.Object, _tokenServiceMock.Object);
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // RegisterAsync
+        // ──────────────────────────────────────────────────────────────────────
+
         [Test]
         public async Task RegisterAsync_HappyPath_ShouldCreateUserAndAddRole()
         {
@@ -99,6 +103,10 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
 
             _userManagerMock.Verify(x => x.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()), Times.Never);
         }
+
+        // ──────────────────────────────────────────────────────────────────────
+        // LoginAsync
+        // ──────────────────────────────────────────────────────────────────────
 
         [Test]
         public async Task LoginAsync_ValidCredentials_ReturnsToken()

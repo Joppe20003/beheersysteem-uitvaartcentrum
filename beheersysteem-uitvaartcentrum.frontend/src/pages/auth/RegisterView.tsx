@@ -21,7 +21,7 @@ function RegisterView() {
             if (errorMessage && errorMessage !== "Failed to fetch") {
                 showAlert(errorMessage, "danger");
             } else {
-                showAlert("Kan niet inloggen met een account, probeer dit later opnieuw", "danger");
+                showAlert("Kan geen account aanmaken, probeer dit later opnieuw", "danger");
             }
         }
     }

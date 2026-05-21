@@ -6,9 +6,10 @@ using beheersysteem_uitvaartcentrum.backend.application.Security;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,8 +17,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Allow large file uploads (increase multipart body and request size limits)
-// Set to 500 MB here; adjust as needed.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+builder.Services.Configure<AntiforgeryOptions>(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 1024L * 1024L * 512L; // 500 MB

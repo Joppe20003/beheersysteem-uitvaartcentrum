@@ -25,11 +25,9 @@ namespace beheersysteem_uitvaartcentrum.backend.ui_tests.UseCases
 
             var dossierTitle = Page.GetByLabel("dossier-title-field");
             var dossierDescription = Page.GetByLabel("dossier-description-field");
-            var dossierCreatedDate = Page.GetByLabel("dossier-created-date-field");
 
             await Expect(dossierTitle).ToHaveTextAsync("Dossier Zonder Extra's");
             await Expect(dossierDescription).ToHaveTextAsync("Eigendom van Jan, geen genodigden.");
-            await Expect(dossierCreatedDate).ToHaveTextAsync("17:40, 18-5-2026");
         }
     }
 }

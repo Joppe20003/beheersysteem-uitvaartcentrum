@@ -109,7 +109,7 @@ namespace beheersysteem_uitvaartcentrum.backend.unit_tests.Services
         // ──────────────────────────────────────────────────────────────────────
 
         [Test]
-        public async Task LoginAsync_ValidCredentials_ReturnsToken()
+        public async Task LoginAsync_HappyPath_ReturnsJwtToken()
         {
             // Arrange
             var dto = new LoginDTO

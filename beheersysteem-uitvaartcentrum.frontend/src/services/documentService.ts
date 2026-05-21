@@ -20,11 +20,15 @@ class DocumentService {
         });
 
         if (!res.ok) {
+            const error = await res.json();
 
-            const responseText = await res.text();
-
-            throw responseText || res.statusText || "Server fout";
+            throw error
         }
+
+        if (res.status == 204) {
+            return null;
+        }
+
 
         return res.json();
     }

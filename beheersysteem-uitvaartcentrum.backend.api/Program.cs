@@ -6,14 +6,34 @@ using beheersysteem_uitvaartcentrum.backend.application.Security;
 using beheersysteem_uitvaartcentrum.backend.application.Services;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Data;
 using beheersysteem_uitvaartcentrum.backend.infrastructure.Repositories;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+builder.Services.Configure<AntiforgeryOptions>(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1024L * 1024L * 512L; // 500 MB
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 1024L * 1024L * 512L; // 500 MB
+});
 
 // Threat #25/#32 - XSS mitigatie: globale sanitatie filter voor alle inkomende requests
 builder.Services.AddScoped<SanitizeInputFilter>();
@@ -38,6 +58,7 @@ builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IFileStorageProvider, FileStorageProvider>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {

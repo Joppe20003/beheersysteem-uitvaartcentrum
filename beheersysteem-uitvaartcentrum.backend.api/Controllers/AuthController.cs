@@ -1,8 +1,6 @@
 ﻿using beheersysteem_uitvaartcentrum.backend.application.DTOs.Auth;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
-using beheersysteem_uitvaartcentrum.backend.application.Security;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace beheersysteem_uitvaartcentrum.backend.api.Controllers;
@@ -11,48 +9,32 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly ITokenService _tokenService;
+    private readonly IAuthService _authService;
     private readonly IConfiguration _config;
 
-    public AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService, IConfiguration config)
+    public AuthController(IAuthService authService, IConfiguration config)
     {
-        _userManager = userManager;
-        _tokenService = tokenService;
+        _authService = authService;
         _config = config;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest dto)
+    public async Task<IActionResult> Register([FromBody] Requests.RegisterRequest dto)
     {
         if(!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        if (await _userManager.FindByEmailAsync(dto.Email) != null)
+        var appDto = new RegisterDTO
         {
-            return BadRequest(new { message = "Kan geen account aanmaken, Email is al in gebruik" });
-        }
-
-        if (await _userManager.FindByNameAsync(dto.Username) != null)
-        {
-            return BadRequest(new { message = "Kan geen account aanmaken, Gebruikersnaam is al in gebruik." });
-        }
-
-        IdentityUser user = new IdentityUser
-        {
-            UserName = dto.Username,
-            Email = dto.Email
+            Username = dto.Username,
+            Email = dto.Email,
+            Password = dto.Password,
+            Role = dto.Role
         };
-        IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
 
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        await _userManager.AddToRoleAsync(user, dto.Role.ToString());
+        await _authService.RegisterAsync(appDto);
 
         return Ok(new {message = "Account aangemaakt."});
     }
@@ -65,11 +47,15 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        IdentityUser? user = await _userManager.FindByEmailAsync(dto.Email);
+        var appDto = new LoginDTO
+        {
+            Email = dto.Email,
+            Password = dto.Password
+        };
 
-        if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password)) return BadRequest(new { message = "Ongeldige inloggegevens." });
+        string token = await _authService.LoginAsync(appDto);
 
-        string token = await _tokenService.GenerateTokenAsync(user);
+        // set token cookie
         CookieOptions cookieOptions = new CookieOptions
         {
             HttpOnly = true,
@@ -83,7 +69,7 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             message = "Inloggen geslaagd.",
-            email = user.Email
+            email = appDto.Email
         });
     }
 
@@ -105,20 +91,17 @@ public class AuthController : ControllerBase
     [HttpGet("status")]
     public async Task<IActionResult> GetStatus()
     {
-        IdentityUser? user = await _userManager.GetUserAsync(User);
+        UserStatusResult? status = await _authService.GetStatusAsync(User);
 
-        if (user == null) return Unauthorized();
-
-        IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
-        List<string> actions = RolePermissions.GetActionsForRoles(roles.ToList());
+        if (status == null) return Unauthorized();
 
         return Ok(new
         {
-            isAuthenticated = true,
-            username = user.UserName,
-            userId = user.Id,
-            role = roles,
-            actions = actions
+            isAuthenticated = status.IsAuthenticated,
+            username = status.Username,
+            userId = status.UserId,
+            role = status.Roles,
+            actions = status.Actions
         });
     }
 }

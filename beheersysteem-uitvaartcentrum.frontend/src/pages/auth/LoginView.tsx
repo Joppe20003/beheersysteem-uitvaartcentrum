@@ -24,7 +24,7 @@ function LoginView() {
             if (errorMessage && errorMessage !== "Failed to fetch") {
                 showAlert(errorMessage, "danger");
             } else {
-                showAlert("Kan geen account aanmaken, probeer dit later opnieuw", "danger");
+                showAlert("Kan niet inloggen, probeer dit later opnieuw", "danger");
             }
         }
     }

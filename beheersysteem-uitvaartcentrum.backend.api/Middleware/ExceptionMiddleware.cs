@@ -22,7 +22,7 @@ namespace beheersysteem_uitvaartcentrum.backend.api.Middleware
                 context.Response.StatusCode = 403;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsJsonAsync(forbiddenException.Message);
+                await context.Response.WriteAsJsonAsync(new { Message = forbiddenException.Message });
             }
             catch (NotFoundForeignKey notFoundForeignKey)
             {

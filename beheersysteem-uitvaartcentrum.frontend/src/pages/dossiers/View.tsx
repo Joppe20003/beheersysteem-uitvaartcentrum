@@ -10,7 +10,7 @@ import useUploadDocument from "../../hooks/useUploadDocument";
 
 import Table, { ColumnDef } from "../../components/shared/Table";
 
-import { ACCEPTED_FILE_EXSTENSIONS } from "../../constants/files"
+import { ACCEPTED_FILE_EXTENSIONS }  from "../../constants/files"
 
 import { useAuth } from "../../hooks/useAuth";
 
@@ -21,6 +21,8 @@ import Dialog from "../../components/shared/Dialog";
 function View() {
     const navigate = useNavigate();
     const { id } = useParams();
+
+    // Zorg dat je hook 'loading' op true zet zodra refetch() wordt aangeroepen
     const { dossier, refetch, loading } = useDossierById(id!);
     const { upload, uploading } = useUploadDocument();
     const { user } = useAuth();
@@ -28,14 +30,14 @@ function View() {
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-
         const file = e.target.files?.[0];
-
         if (!file || !id) return;
 
+        // Wacht tot de upload klaar is
         await upload(id, file);
 
-        refetch();
+        // Wacht tot de data opnieuw is opgehaald voor de UI
+        await refetch();
 
         e.target.value = "";
     };
@@ -54,9 +56,10 @@ function View() {
         setIsInviteDialogOpen(true);
     }
 
-    const handleInviteComplete = () => {
+    const handleInviteComplete = async () => {
         setIsInviteDialogOpen(false);
-        refetch();
+
+        await refetch();
     }
 
     const columns: ColumnDef[] = [
@@ -89,7 +92,7 @@ function View() {
         },
     ];
 
-    if (loading) {
+    if (loading && !dossier) {
         return (
             <section className="row">
                 <legend className="h1" tabIndex={0}>Dossiers detail</legend>
@@ -105,12 +108,19 @@ function View() {
                     ref={fileInputRef}
                     type="file"
                     className="d-none"
-                    accept={ACCEPTED_FILE_EXSTENSIONS}
+                    accept={ACCEPTED_FILE_EXTENSIONS.join(",")}
                     onChange={handleFileChange}
                 />
                 <article>
                     <header className="d-flex py-2">
-                        <legend className="h3" style={{ textWrap: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} tabIndex={0}>{dossier?.title}</legend>
+                        <legend
+                            className="h3"
+                            aria-label="dossier-title-field"
+                            style={{ textWrap: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                            tabIndex={0}
+                        >
+                            {dossier?.title}
+                        </legend>
 
                         <div className="d-none d-sm-block">
                             <div className="d-flex" style={{ height: "stretch" }}>
@@ -137,10 +147,28 @@ function View() {
                             </div>
                         </div>
                     </header>
-                    <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dossier?.description || "Beschrijving niet aanwezig"}</p>
+
+                    <p
+                        className="h4 fw-normal text-muted mb-4"
+                        aria-label="dossier-description-field"
+                        tabIndex={0}
+                    >
+                        {dossier?.description || "Beschrijving niet aanwezig"}
+                    </p>
+
                     <p className="h4 fw-normal mb-2" tabIndex={0}>Aanmaak datum:</p>
-                    <p className="h4 fw-normal text-muted mb-4" tabIndex={0}>{dateFormatter(dossier?.dateCreated, "datetime-nl")}</p>
-                    <p className="h4 fw-normal mb-2" tabIndex={0}>Mensen met toegang: ({dossier?.invitedUsers.length})</p>
+                    <p
+                        className="h4 fw-normal text-muted mb-4"
+                        aria-label="dossier-created-date-field"
+                        tabIndex={0}
+                    >
+                        {dateFormatter(dossier?.dateCreated, "datetime-nl")}
+                    </p>
+
+                    <p className="h4 fw-normal mb-2" tabIndex={0}>
+                        Mensen met toegang: ({dossier?.invitedUsers.length})
+                    </p>
+
                     <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
                         {dossier?.invitedUsers.map((invitedUser) => (
                             <div
@@ -167,7 +195,7 @@ function View() {
                             </div>
                         ))}
 
-                        { user?.userId == dossier?.userId && (
+                        {user?.userId == dossier?.userId && (
                             <button
                                 className="col-auto btn d-flex align-items-center justify-content-center shadow-sm"
                                 onClick={handleAddUserToDossierClick}
@@ -187,9 +215,15 @@ function View() {
                             </button>
                         )}
                     </div>
+
                     <p className="h4 fw-normal mb-2" tabIndex={0}>Bestanden: (toegestaande extensies: PDF, JPG, JPEG, PNG)</p>
-                    <Table data={dossier?.documents || []} columns={columns} noResultsText="Geen gekoppelde bestanden bij dit dossier" />
+                    <Table
+                        data={dossier?.documents || []}
+                        columns={columns}
+                        noResultsText="Geen gekoppelde bestanden bij dit dossier"
+                    />
                 </article>
+
                 <div className="d-sm-none col-12" style={{ height: 120 }} />
                 <div className="d-sm-none position-fixed bg-white bottom-0 border-top shadow p-2">
                     <div className="d-flex flex-column">
@@ -210,8 +244,18 @@ function View() {
                 </div>
             </section>
 
-            <Dialog isOpen={isInviteDialogOpen} title="Nodig iemand uit" onClose={() => setIsInviteDialogOpen(false)} size="md" footer={null}>
-                <PeopleSelector dossierId={dossier?.id} onInviteComplete={handleInviteComplete} onClose={() => setIsInviteDialogOpen(false)} />
+            <Dialog
+                isOpen={isInviteDialogOpen}
+                title="Nodig iemand uit"
+                onClose={() => setIsInviteDialogOpen(false)}
+                size="md"
+                footer={null}
+            >
+                <PeopleSelector
+                    dossierId={dossier?.id}
+                    onInviteComplete={handleInviteComplete}
+                    onClose={() => setIsInviteDialogOpen(false)}
+                />
             </Dialog>
         </>
     );

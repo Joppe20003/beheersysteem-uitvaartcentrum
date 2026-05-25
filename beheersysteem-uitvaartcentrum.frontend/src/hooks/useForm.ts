@@ -10,11 +10,20 @@ export function useForm<T extends object>(initialValues: T, schema?: ZodSchema<T
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
         const { name, value } = e.target;
-        setValues(prev => ({ ...prev, [name]: value }));
-        setErrors(prev => ({ ...prev, [name]: [] }));
 
+        setValues((prev) => ({
+            ...prev,
+            [name]: name === "role" ? Number(value) : value,
+        }));
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: [],
+        }));
     };
 
     const handleSubmit = (onSubmit: (values: T) => Promise<void>) =>

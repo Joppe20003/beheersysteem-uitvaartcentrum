@@ -6,6 +6,7 @@ using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositories;
 using beheersysteem_uitvaartcentrum.backend.application.Interfaces.Services;
 using beheersysteem_uitvaartcentrum.backend.domain.Constanten;
 using beheersysteem_uitvaartcentrum.backend.domain.Models;
+using System.Security.Claims;
 
 public class DocumentService : IDocumentService
 {
@@ -38,15 +39,17 @@ public class DocumentService : IDocumentService
         return viewDocumentDTO;
     }
 
-    public async Task<ViewDocumentDTO> UploadDocumentAsync(UploadDocumentDTO dto)
+    public async Task<ViewDocumentDTO> UploadDocumentAsync(ClaimsPrincipal user, UploadDocumentDTO uploadDocumentDTO)
     {
-        await CheckDossierIdExists(dto.DossierId);
+        string userId = user.FindFirst(claim => claim.Type == "userId")?.Value;
 
-        await _fileStorageProvider.CheckExstensionIsAllowed(dto.FileName);
+        await CheckDossierIdExists(user, uploadDocumentDTO.DossierId);
 
-        await _fileStorageProvider.UploadDocumentAsync(dto.DossierId, dto.FileName, dto.Content, Constanten.AllowedFileExtensions);
+        await _fileStorageProvider.CheckExstensionIsAllowed(uploadDocumentDTO.FileName);
 
-        DocumentModel? existing = await _documentRepository.GetDocumentByDossierAndNameAsync(dto.DossierId, dto.FileName);
+        await _fileStorageProvider.UploadDocumentAsync(uploadDocumentDTO.DossierId, uploadDocumentDTO.FileName, uploadDocumentDTO.Content, Constanten.AllowedFileExtensions);
+
+        DocumentModel? existing = await _documentRepository.GetDocumentByDossierAndNameAsync(uploadDocumentDTO.DossierId, uploadDocumentDTO.FileName);
 
         if (existing != null)
         {
@@ -66,9 +69,10 @@ public class DocumentService : IDocumentService
         DocumentModel model = new DocumentModel
         {
             Id = Guid.NewGuid(),
-            DossierId = dto.DossierId,
-            Title = dto.FileName,
-            Extensions = Path.GetExtension(dto.FileName),
+            UserId = Guid.Parse(userId),
+            DossierId = uploadDocumentDTO.DossierId,
+            Title = uploadDocumentDTO.FileName,
+            Extensions = Path.GetExtension(uploadDocumentDTO.FileName),
             DateUploaded = DateTime.UtcNow
         };
 
@@ -83,7 +87,7 @@ public class DocumentService : IDocumentService
         };
     }
 
-    public async Task<DownloadDocumentDTO?> DownloadDocumentAsync(Guid id)
+    public async Task<DownloadDocumentDTO?> DownloadDocumentAsync(ClaimsPrincipal user, Guid id)
     {
         DocumentModel? documentModel = await _documentRepository.GetDocumentAsync(id);
 
@@ -99,9 +103,9 @@ public class DocumentService : IDocumentService
         };
     }
 
-    private async Task CheckDossierIdExists(Guid dossierId)
+    private async Task CheckDossierIdExists(ClaimsPrincipal user, Guid dossierId)
     {
-        ViewDossierDTO? dossierViewDTO = await _dossierService.GetDossierAsync(dossierId);
+        ViewDossierDTO? dossierViewDTO = await _dossierService.GetDossierAsync(user, dossierId);
 
         if (dossierViewDTO == null)
         {

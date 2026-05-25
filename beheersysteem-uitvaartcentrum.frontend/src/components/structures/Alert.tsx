@@ -16,13 +16,13 @@ function Alert() {
     return (
         <div
             ref={alertRef}
-            className={`alert alert-${alert.type} alert-dismissible position-absolute col-md-4`}
-            style={{ right: 10, top: 10 }}
+            className={`alert alert-${alert.type} alert-dismissible col-md-4 border border-${alert.type} shadow`}
+            style={{ right: 10, top: 10, position: 'fixed', zIndex: 2000 }}
             role="alert"
             tabIndex={0}
         >
             {alert.message}
-            <button type="button" className="btn-close" aria-aria-label={`${alert.message}, melding sluiten`} onClick={clearAlert} />
+            <button type="button" className="btn-close" aria-label={`${alert.message}, melding sluiten`} onClick={clearAlert} />
         </div>
     );
 }

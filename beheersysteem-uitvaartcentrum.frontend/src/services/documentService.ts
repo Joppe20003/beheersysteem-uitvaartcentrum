@@ -7,28 +7,36 @@ class DocumentService {
         this.baseUrl = baseUrl;
     }
 
-    upload(dossierId: string, file: File) {
+    async upload(dossierId: string, file: File) {
         const formData = new FormData();
+
         formData.append("DossierId", dossierId);
         formData.append("File", file);
 
-        return fetch(this.baseUrl + "Document", {
+        const res = await fetch(this.baseUrl + "Document", {
             method: "POST",
             body: formData,
-        }).then(async (res) => {
-            const data = await res.json().catch(() => null);
-
-            if (!res.ok) {
-                throw data;
-            }
-
-            return data;
+            credentials: "include"
         });
+
+        if (!res.ok) {
+            const error = await res.json();
+
+            throw error
+        }
+
+        if (res.status == 204) {
+            return null;
+        }
+
+
+        return res.json();
     }
 
-    download(id: string) {
+    async download(id: string) {
         return fetch(this.baseUrl + `Document/${id}/download`, {
             method: "GET",
+            credentials: "include"
         }).then((res) => {
             if (!res.ok) throw res;
             return res.blob();

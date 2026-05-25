@@ -1,9 +1,17 @@
 ﻿import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "./useAlert";
 import { dossierService } from "../services/dossierService";
+
+type InvitedUser = {
+    userId: string;
+    userName: string;
+};
 
 type Dossier = {
     id: string;
+    userId: string;
+    invitedUsers: InvitedUser[];
     title: string;
     description?: string;
     dateCreated: string;
@@ -15,6 +23,7 @@ function useDossierById(id: string) {
     const [loading, setLoading] = useState(true);
     const [trigger, setTrigger] = useState(0);
 
+    const { showAlert } = useAlert();
     const refetch = useCallback(() => setTrigger(t => t + 1), []);
     const navigate = useNavigate();
 
@@ -22,17 +31,19 @@ function useDossierById(id: string) {
         if (!id) return;
 
         let cancelled = false;
-        setLoading(true);
 
         dossierService.getById(id)
             .then((data) => {
+                setLoading(true);
                 if (!cancelled) setDossier(data);
             })
             .catch((error) => {
                 if (!cancelled) {
-                    console.error(error)
+                    console.error(error);
 
-                    navigate(-1);
+                    showAlert("Dossier kon niet worden gevonden of bestaat niet meer.", "danger");
+
+                    navigate("/dossiers");
                 }
             })
             .finally(() => {
@@ -42,7 +53,7 @@ function useDossierById(id: string) {
         return () => {
             cancelled = true;
         };
-    }, [id, trigger, navigate]);
+    }, [id, trigger, navigate, showAlert]);
 
     return { dossier, loading, refetch };
 }

@@ -12,9 +12,19 @@ class DossierService {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
+            credentials: "include"
         });
 
-        if (!res.ok) throw res;
+        if (!res.ok) {
+            const error = await res.json();
+
+            throw error
+        }
+
+        if (res.status == 204) {
+            return null;
+        }
+
         return res.json();
     }
 
@@ -22,21 +32,26 @@ class DossierService {
         const res = await fetch(this.baseUrl + endpoint, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
+            credentials: "include"
         });
 
         if (!res.ok) throw res;
         return res.json();
     }
 
-    create(data: unknown) {
-        return this.post("dossier", data);
+    async invite(data: unknown) {
+        return this.post("dossier/invite", data);
     }
 
-    getAll() {
+    async create(data: unknown) {
+        return this.post("dossier/create", data);
+    }
+
+    async getAll() {
         return this.get("dossier");
     }
 
-    getById(id: string) {
+    async getById(id: string) {
         return this.get(`dossier/${id}`);
     }
 }

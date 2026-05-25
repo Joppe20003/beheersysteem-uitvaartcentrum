@@ -7,5 +7,6 @@ namespace beheersysteem_uitvaartcentrum.backend.application.Interfaces.Repositor
         public Task<DossierModel?> GetDossierAsync(Guid id);
         public Task<List<DossierModel>> GetAllDossiersAsync();
         public Task<DossierModel> CreateDossierAsync(DossierModel dossier);
+        public Task InviteUserToDossierAsync(DossierInvitedModel dossierInvitedModel);
     }
 }

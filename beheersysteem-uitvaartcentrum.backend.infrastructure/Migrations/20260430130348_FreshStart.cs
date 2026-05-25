@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class fixingModels : Migration
+    public partial class FreshStart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,6 +36,13 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                 oldClrType: typeof(string),
                 oldType: "text");
 
+            migrationBuilder.AddColumn<Guid>(
+                name: "UserId",
+                table: "Dossiers",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
             migrationBuilder.AlterColumn<Guid>(
                 name: "DossierId",
                 table: "Documents",
@@ -45,6 +52,31 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
                 oldClrType: typeof(Guid),
                 oldType: "uuid",
                 oldNullable: true);
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "UserId",
+                table: "Documents",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            migrationBuilder.CreateTable(
+                name: "DossierInvited",
+                columns: table => new
+                {
+                    DossierId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DossierInvited", x => new { x.DossierId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_DossierInvited_Dossiers_DossierId",
+                        column: x => x.DossierId,
+                        principalTable: "Dossiers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Documents_Dossiers_DossierId",
@@ -60,6 +92,17 @@ namespace beheersysteem_uitvaartcentrum.backend.infrastructure.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Documents_Dossiers_DossierId",
+                table: "Documents");
+
+            migrationBuilder.DropTable(
+                name: "DossierInvited");
+
+            migrationBuilder.DropColumn(
+                name: "UserId",
+                table: "Dossiers");
+
+            migrationBuilder.DropColumn(
+                name: "UserId",
                 table: "Documents");
 
             migrationBuilder.RenameColumn(

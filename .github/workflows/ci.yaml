@@ -90,6 +90,14 @@ jobs:
           dotnet restore beheersysteem-uitvaartcentrum.backend.api
           dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
 
+      - name: Wait for PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U postgres && echo "Postgres ready" && break
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
       - name: Start Backend
         env:
           ASPNETCORE_ENVIRONMENT: Development

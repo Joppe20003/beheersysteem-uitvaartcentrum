@@ -140,12 +140,16 @@ using (var scope = app.Services.CreateScope())
 
     DbInitializer.Seed(authContext);
 
+    authContext.SaveChanges();
+
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
 
         DbInitializer.Fixture(userManager, appContext);
+
+        appContext.SaveChanges();
     }
 }
 

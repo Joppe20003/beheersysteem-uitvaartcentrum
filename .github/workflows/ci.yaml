@@ -80,8 +80,7 @@ jobs:
       - name: Start Frontend
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: |
-          npm run build
-          npm run preview &
+          npm run dev
           echo "Waiting for frontend to start..."
           sleep 5
 

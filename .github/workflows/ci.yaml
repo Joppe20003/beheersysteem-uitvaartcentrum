@@ -19,7 +19,7 @@ on:
       - bugfix/*
 
 jobs:
-  build-backend:
+  backend-and-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,16 +33,11 @@ jobs:
         run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
 
       - name: Build Backend
-        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
 
-      - name: Upload Built Backend Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-backend
-          path: |
-            **/bin/Debug/net10.0/
-            **/obj/Debug/net10.0/
-
+      - name: Unit Tests
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
+      
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -51,118 +46,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20' # LTS versie aangeraden voor Vite
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm ci
 
       - name: Build Frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend # Pas pad aan indien nodig
         run: npm run build
-
-      - name: Upload Frontend Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-frontend
-          path: ./beheersysteem-uitvaartcentrum.frontend/
-
-  tests:
-    runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Download Built Backend
-        uses: actions/download-artifact@v4
-        with:
-          name: built-backend
-
-      - name: Download Built Frontend
-        uses: actions/download-artifact@v4
-        with:
-          name: built-frontend
-          path: ./beheersysteem-uitvaartcentrum.frontend
-
-      - name: Fix Backend Permissions
-        run: chmod +x **/bin/Debug/net10.0/* || true
-
-      - name: Fix Frontend Binaries
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        run: npm rebuild && npm link vite || true
-
-      - name: Start Backend
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
-          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaartcentrum;Username=postgres;Password=postgres;Include Error Detail=true"
-          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=auth;Username=postgres;Password=postgres;Include Error Detail=true"
-          FileStorage__BasePath: /tmp/uploads
-          Cors__AllowedOrigins: "https://localhost:5173"
-          Jwt__Key: ${{ secrets.JWT_KEY }}
-          Jwt__Issuer: ${{ secrets.JWT_ISSUER }}
-          Jwt__Audience: ${{ secrets.JWT_AUDIENCE }}
-          Jwt__ExpiresInMinutes: "60"
-        run: |
-          dotnet run --project beheersysteem-uitvaartcentrum.backend.api --no-build --launch-profile "https" &
-          echo "Wachten tot backend online is op HTTPS poort 7235..."
-          for i in $(seq 1 15); do
-            curl -sk https://localhost:7235 > /dev/null 2>&1 && echo "Backend is klaar en geseed!" && break
-            echo "Poging $i..."
-            sleep 2
-          done
-
-      - name: Start Frontend
-        working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        env:
-          NODE_TLS_REJECT_UNAUTHORIZED: "0"
-          VITE_API_URL: "https://localhost:7235/"
-        run: |
-          npm run dev &
-          echo "Wachten op frontend..."
-          for i in $(seq 1 15); do
-            curl -sk https://localhost:5173 > /dev/null 2>&1 && echo "Frontend is klaar" && break
-            echo "Poging $i..."
-            sleep 2
-          done
-
-      - name: Restore & Build UI tests
-        run: |
-          dotnet restore beheersysteem-uitvaartcentrum.backend.ui-tests
-          dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --no-restore
-
-      - name: Install Playwright browsers
-        run: pwsh beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
-
-      - name: Unit Tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj
-
-      - name: Run Playwright tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --no-build

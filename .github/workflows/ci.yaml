@@ -96,8 +96,7 @@ jobs:
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: |
           npm ci
-          npm run build
-          npm run preview &
+          npm run dev &
           sleep 5
 
       - name: Restore UI test dependencies

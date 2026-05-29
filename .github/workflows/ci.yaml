@@ -33,10 +33,10 @@ jobs:
         run: dotnet restore beheersysteem-uitvaartcentrum.backend.api
 
       - name: Build Backend
-        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore
 
       - name: Unit Tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj --configuration Release
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.unit-tests/beheersysteem-uitvaartcentrum.backend.unit-tests.csproj
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -68,12 +68,12 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres # Standaard database voor de container zelf
+          POSTGRES_DB: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
           --health-timeout 5s
           --health-retries 5
 
@@ -88,21 +88,13 @@ jobs:
       - name: Restore & Build Backend
         run: |
           dotnet restore beheersysteem-uitvaartcentrum.backend.api
-          dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
+          dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore
 
-      - name: Wait for PostgreSQL
-        run: |
-          for i in $(seq 1 30); do
-            pg_isready -h localhost -p 5432 -U postgres && echo "Postgres ready" && break
-            echo "Waiting for postgres..."
-            sleep 2
-          done
+      - name: Wait for Postgres to be fully stable
+        run: sleep 5
 
       - name: Start Backend
         env:
-          ASPNETCORE_ENVIRONMENT: Development
-          ASPNETCORE_URLS: http://localhost:5277
-          # GEFIXT: Twee aparte databases opgesplitst om te voorkomen dat migraties en seeders elkaar overschrijven
           ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaart_app_test;Username=postgres;Password=postgres;Include Error Detail=true"
           ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=uitvaart_auth_test;Username=postgres;Password=postgres;Include Error Detail=true"
           FileStorage__BasePath: /tmp/uploads
@@ -112,15 +104,7 @@ jobs:
           Jwt__Audience: ${{ secrets.JWT_AUDIENCE }}
           Jwt__ExpiresInMinutes: "60"
         run: |
-          dotnet run --project beheersysteem-uitvaartcentrum.backend.api \
-            --configuration Development \
-            --no-launch-profile &
-          echo "Wachten op backend..."
-          for i in $(seq 1 30); do
-            curl -s http://localhost:5277/auth/status > /dev/null 2>&1 && echo "Backend is klaar" && break
-            echo "Poging $i..."
-            sleep 2
-          done
+          dotnet run --project beheersysteem-uitvaartcentrum.backend.api --no-launch-profile &
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -131,27 +115,18 @@ jobs:
 
       - name: Install & Start Frontend
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
-        env:
-          NODE_TLS_REJECT_UNAUTHORIZED: "0"
-          VITE_API_URL: http://localhost:5277/
         run: |
           npm ci
-          npm run dev &
-          echo "Wachten op frontend..."
-          for i in $(seq 1 30); do
-            curl -sk https://localhost:5173 > /dev/null 2>&1 && echo "Frontend is klaar" && break
-            echo "Poging $i..."
-            sleep 2
-          done
+          npm run dev
 
       - name: Restore UI test dependencies
         run: dotnet restore beheersysteem-uitvaartcentrum.backend.ui-tests
 
       - name: Build UI tests
-        run: dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --no-restore --configuration Release
+        run: dotnet build beheersysteem-uitvaartcentrum.backend.ui-tests --no-restore
 
       - name: Install Playwright browsers
-        run: pwsh beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+        run: pwsh beheersysteem-uitvaartcentrum.backend.ui-tests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 
       - name: Run Playwright tests
-        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
+        run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests

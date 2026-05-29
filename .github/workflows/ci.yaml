@@ -95,10 +95,10 @@ jobs:
 
       - name: Start Backend
         env:
-          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaart_app_test;Username=postgres;Password=postgres;Include Error Detail=true"
-          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=uitvaart_auth_test;Username=postgres;Password=postgres;Include Error Detail=true"
+          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaartcentrum;Username=postgres;Password=postgres;Include Error Detail=true"
+          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=auth;Username=postgres;Password=postgres;Include Error Detail=true"
           FileStorage__BasePath: /tmp/uploads
-          Cors__AllowedOrigins: https://localhost:5173
+          Cors__AllowedOrigins: "https://localhost:5173"
           Jwt__Key: ${{ secrets.JWT_KEY }}
           Jwt__Issuer: ${{ secrets.JWT_ISSUER }}
           Jwt__Audience: ${{ secrets.JWT_AUDIENCE }}
@@ -117,7 +117,13 @@ jobs:
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: |
           npm ci
-          npm run dev
+          npm run dev &
+          echo "Wachten op frontend..."
+          for i in $(seq 1 30); do
+            curl -sk https://localhost:5173 > /dev/null 2>&1 && echo "Frontend is klaar" && break
+            echo "Poging $i..."
+            sleep 2
+          done
 
       - name: Restore UI test dependencies
         run: dotnet restore beheersysteem-uitvaartcentrum.backend.ui-tests

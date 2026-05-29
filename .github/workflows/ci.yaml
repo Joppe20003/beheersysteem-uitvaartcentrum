@@ -90,11 +90,9 @@ jobs:
           dotnet restore beheersysteem-uitvaartcentrum.backend.api
           dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore
 
-      - name: Wait for Postgres to be fully stable
-        run: sleep 5
-
       - name: Start Backend
         env:
+          ASPNETCORE_ENVIRONMENT: Development
           ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaartcentrum;Username=postgres;Password=postgres;Include Error Detail=true"
           ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=auth;Username=postgres;Password=postgres;Include Error Detail=true"
           FileStorage__BasePath: /tmp/uploads

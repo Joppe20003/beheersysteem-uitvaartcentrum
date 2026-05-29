@@ -103,6 +103,13 @@ jobs:
           Jwt__ExpiresInMinutes: "60"
         run: |
           dotnet run --project beheersysteem-uitvaartcentrum.backend.api --no-launch-profile &
+          echo "Wachten tot backend online is en databases heeft gevuld..."
+          # GEFIXT: Wacht maximaal 30 seconden tot poort 5277 antwoord geeft
+          for i in $(seq 1 15); do
+            curl -s http://localhost:7235 > /dev/null 2>&1 && echo "Backend is helemaal klaar!" && break
+            echo "Backend start op (poging $i)..."
+            sleep 2
+          done
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

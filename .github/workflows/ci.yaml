@@ -35,7 +35,6 @@ jobs:
       - name: Build Backend
         run: dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore
 
-      # HERGEBRUIK: Sla de gecompileerde backend op voor de Playwright job
       - name: Upload Built Backend Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -64,14 +63,13 @@ jobs:
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
         run: npm run build
 
-      # HERGEBRUIK: Sla de frontend node_modules op (Vite dev heeft dit nodig om te runnen)
       - name: Upload Frontend Artifact
         uses: actions/upload-artifact@v4
         with:
           name: built-frontend
           path: ./beheersysteem-uitvaartcentrum.frontend/
 
-  playwright-tests:
+  tests:
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend]
 
@@ -103,7 +101,6 @@ jobs:
         with:
           node-version: '20'
 
-      # HERGEBRUIK: Haal de gebouwde backend en frontend binnen (geen dotnet build/npm ci meer nodig!)
       - name: Download Built Backend
         uses: actions/download-artifact@v4
         with:
@@ -114,6 +111,13 @@ jobs:
         with:
           name: built-frontend
           path: ./beheersysteem-uitvaartcentrum.frontend
+
+      - name: Fix Backend Permissions
+        run: chmod +x **/bin/Debug/net10.0/* || true
+
+      - name: Fix Frontend Binaries
+        working-directory: ./beheersysteem-uitvaartcentrum.frontend
+        run: npm rebuild && npm link vite || true
 
       - name: Start Backend
         env:
@@ -127,7 +131,6 @@ jobs:
           Jwt__Audience: ${{ secrets.JWT_AUDIENCE }}
           Jwt__ExpiresInMinutes: "60"
         run: |
-          # Start direct op vanuit de reeds gebouwde binaries
           dotnet run --project beheersysteem-uitvaartcentrum.backend.api --no-build --launch-profile "https" &
           echo "Wachten tot backend online is op HTTPS poort 7235..."
           for i in $(seq 1 15); do
@@ -138,11 +141,13 @@ jobs:
 
       - name: Start Frontend
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
+        env:
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
+          VITE_API_URL: "https://localhost:7235/"
         run: |
-          # Start direct zonder npm ci, want de map is al compleet gedownload
           npm run dev &
           echo "Wachten op frontend..."
-          for i in $(seq 1 30); do
+          for i in $(seq 1 15); do
             curl -sk https://localhost:5173 > /dev/null 2>&1 && echo "Frontend is klaar" && break
             echo "Poging $i..."
             sleep 2

@@ -142,16 +142,21 @@ using (var scope = app.Services.CreateScope())
 
     if (app.Environment.IsDevelopment())
     {
+        DbInitializer.Fixture(userManager, appContext);
+
         app.UseSwagger();
         app.UseSwaggerUI();
-
-        DbInitializer.Fixture(userManager, appContext);
     }
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("Frontend");
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

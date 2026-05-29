@@ -113,7 +113,7 @@ jobs:
           Jwt__ExpiresInMinutes: "60"
         run: |
           dotnet run --project beheersysteem-uitvaartcentrum.backend.api \
-            --configuration Release \
+            --configuration Development \
             --no-launch-profile &
           echo "Wachten op backend..."
           for i in $(seq 1 30); do

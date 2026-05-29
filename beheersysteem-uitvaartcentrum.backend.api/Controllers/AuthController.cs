@@ -11,11 +11,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IConfiguration _config;
+    private readonly IWebHostEnvironment _env;
 
-    public AuthController(IAuthService authService, IConfiguration config)
+    public AuthController(IAuthService authService, IConfiguration config, IWebHostEnvironment env)
     {
         _authService = authService;
         _config = config;
+        _env = env;
     }
 
     [HttpPost("register")]

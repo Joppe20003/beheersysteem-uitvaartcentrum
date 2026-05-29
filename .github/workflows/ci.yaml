@@ -108,7 +108,7 @@ jobs:
             --no-launch-profile &
           echo "Wachten op backend..."
           for i in $(seq 1 30); do
-            curl -sk http://localhost:5277/auth/status > /dev/null 2>&1 && echo "Backend is klaar" && break
+            curl -s http://localhost:5277/auth/status > /dev/null 2>&1 && echo "Backend is klaar" && break
             echo "Poging $i..."
             sleep 2
           done
@@ -124,6 +124,7 @@ jobs:
         working-directory: ./beheersysteem-uitvaartcentrum.frontend
         env:
           NODE_TLS_REJECT_UNAUTHORIZED: "0"
+          VITE_API_URL: http://localhost:5277/
         run: |
           npm ci
           npm run dev &
@@ -145,11 +146,3 @@ jobs:
 
       - name: Run Playwright tests
         run: dotnet test beheersysteem-uitvaartcentrum.backend.ui-tests --configuration Release
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: ./beheersysteem-uitvaartcentrum.backend.ui-tests/playwright-report/
-          retention-days: 30

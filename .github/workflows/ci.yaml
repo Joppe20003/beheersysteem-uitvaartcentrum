@@ -68,7 +68,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: uitvaartcentrum_test
+          POSTGRES_DB: postgres # Standaard database voor de container zelf
         ports:
           - 5432:5432
         options: >-
@@ -90,12 +90,21 @@ jobs:
           dotnet restore beheersysteem-uitvaartcentrum.backend.api
           dotnet build beheersysteem-uitvaartcentrum.backend.api --no-restore --configuration Release
 
+      - name: Wait for PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U postgres && echo "Postgres ready" && break
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
       - name: Start Backend
         env:
           ASPNETCORE_ENVIRONMENT: Development
           ASPNETCORE_URLS: http://localhost:5277
-          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaartcentrum_test;Username=postgres;Password=postgres"
-          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=uitvaartcentrum_test;Username=postgres;Password=postgres"
+          # GEFIXT: Twee aparte databases opgesplitst om te voorkomen dat migraties en seeders elkaar overschrijven
+          ConnectionStrings__AppConnection: "Host=localhost;Port=5432;Database=uitvaart_app_test;Username=postgres;Password=postgres;Include Error Detail=true"
+          ConnectionStrings__AuthConnection: "Host=localhost;Port=5432;Database=uitvaart_auth_test;Username=postgres;Password=postgres;Include Error Detail=true"
           FileStorage__BasePath: /tmp/uploads
           Cors__AllowedOrigins: https://localhost:5173
           Jwt__Key: ${{ secrets.JWT_KEY }}
